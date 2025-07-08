@@ -19,10 +19,9 @@ Route::prefix('admin')->as('admin.')->group(function () {
     Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
     Route::post('/login', [LoginController::class, 'login']);
     Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
-    Route::middleware(['auth', 'admin'])->group(function () {
+    Route::middleware(['auth', 'admin', 'verify.post.size'])->group(function () {
         Route::get('/dashboard', [BookController::class, 'dashboard'])->name('dashboard');
         Route::resource('books', BookController::class);
-        Route::post('/books/upload', [BookController::class, 'upload'])->name('books.upload');
         Route::get('/books/{id}/check_ready', [BookController::class, 'checkReady'])->name('books.check_ready');
     });
 });

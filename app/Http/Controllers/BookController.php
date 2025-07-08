@@ -54,9 +54,9 @@ class BookController extends Controller
             'description' => 'nullable|string',
             'category' => 'required|string|max:100',
             'number_of_pages' => 'nullable|integer|min:1',
-            'cover_image_front' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'cover_image_back' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'book_file' => 'required|file|mimes:pdf,epub|max:10240', // <-- changed
+            'cover_image_front' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:10240',
+            'cover_image_back' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:10240',
+            'book_file' => 'required|file|mimes:pdf,epub|max:51200',
             'language' => 'nullable|string|max:50',
             'level' => 'required|in:Beginner,Intermediate,Advanced',
             'is_bestseller' => 'nullable|boolean',
@@ -112,8 +112,8 @@ class BookController extends Controller
             'price' => 'required|numeric',
 
             'access_type' => 'required|in:purchase,subscription',
-            'cover_image' => 'nullable|image|max:2048',
-            'book_file' => 'required|file|mimes:pdf,epub|max:10240',
+            'cover_image' => 'nullable|image|max:10240',
+            'book_file' => 'required|file|mimes:pdf,epub|max:51200',
         ]);
 
         if ($request->hasFile('cover_image')) {
