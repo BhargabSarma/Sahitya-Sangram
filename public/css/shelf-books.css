@@ -1,0 +1,418 @@
+/* Import Fonts */
+@import url("https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap");
+
+@font-face {
+  src: url("https://fonts.cdnfonts.com/css/cabinet-grotesk") format("woff2");
+  font-family: "Cabinet Grotesk", serif;
+  font-weight: 400;
+}
+
+:root {
+  --container-padding: 2rem;
+  --grid-gap: 1rem;
+  --color-background: #f5f5f0;
+  --color-text-primary: #18191a;
+  --paper-bg: #fff;
+  --paper-border: 1px solid rgba(0, 0, 0, 0.2);
+  --backcover-bg: #111;
+  --circle-1: #ccc;
+  --circle-2: #999;
+  --primary-font: "Inter", sans-serif;
+  --secondary-font: "Cabinet Grotesk", serif;
+}
+
+/* Base Styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background-color: var(--color-background);
+  width: 100vw;
+  min-height: 100vh;
+  overflow-x: hidden;
+  position: relative;
+  font-family: var(--primary-font);
+  letter-spacing: -0.03em;
+  font-weight: 400;
+}
+
+/* Background noise effect */
+body::before {
+  content: "";
+  position: fixed;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: transparent
+    url("http://assets.iceable.com/img/noise-transparent.png") repeat 0 0;
+  background-size: 300px 300px;
+  animation: noise-animation 0.3s steps(5) infinite;
+  opacity: 0.3;
+  will-change: transform;
+  z-index: 100;
+  pointer-events: none;
+}
+
+@keyframes noise-animation {
+  0% { transform: translate(0, 0);}
+  10% { transform: translate(-2%, -3%);}
+  20% { transform: translate(-4%, 2%);}
+  30% { transform: translate(2%, -4%);}
+  40% { transform: translate(-2%, 5%);}
+  50% { transform: translate(-4%, 2%);}
+  60% { transform: translate(3%, 0);}
+  70% { transform: translate(0, 3%);}
+  80% { transform: translate(-3%, 0);}
+  90% { transform: translate(2%, 2%);}
+  100% { transform: translate(1%, 0);}
+}
+
+/* SHELF SECTION STYLES */
+
+/* 12-Column Grid Container: full width with 2rem padding and 1rem gutter */
+.shelf-container {
+  width: 100vw;
+  min-height: 80vh;
+  padding: var(--container-padding);
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  grid-gap: var(--grid-gap);
+  grid-template-rows: auto 1fr auto; /* header, main, button */
+  position: relative;
+}
+.shelf-collections-title {
+  grid-column: 1 / -1;
+  grid-row: 1;
+  text-align: center;
+  font-size: 2rem;
+  font-weight: bold;
+  letter-spacing: 0.05em;
+  color: var(--color-text-primary);
+  margin-bottom: 1.5rem;
+  font-family: var(--secondary-font), sans-serif;
+}
+.shelf-collections-title strong {
+  font-weight: bold;
+}
+/* Top Bar */
+.shelf-top-left {
+  grid-column: 1 / 5;
+  grid-row: 1;
+  align-self: start;
+}
+
+.shelf-top-left h2 {
+  font-family: var(--secondary-font);
+  font-size: 1.25rem;
+  line-height: 1;
+  font-weight: 500;
+  color: var(--color-text-primary);
+}
+
+.shelf-top-right {
+  grid-column: 10 / 13;
+  grid-row: 1;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 4px;
+}
+
+.shelf-top-right .shelf-circle {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.shelf-circle.shelf-circle1 {
+  background: var(--circle-1);
+}
+
+.shelf-circle.shelf-circle2 {
+  background: var(--circle-2);
+  margin-left: -4px;
+}
+
+/* Main Content: Three columns: Left text, Books, Right text */
+.shelf-main-content {
+  grid-column: 1 / -1;
+  grid-row: 2;
+  display: grid;
+  grid-template-columns: 2fr 6fr 2fr;
+  grid-gap: var(--grid-gap);
+  align-items: center;
+}
+
+.shelf-left-text,
+.shelf-right-text {
+  font-weight: 400;
+  font-size: 1rem;
+  line-height: 1.5;
+  color: var(--color-text-primary);
+}
+
+.shelf-left-text {
+  text-align: left;
+}
+
+.shelf-right-text {
+  text-align: right;
+}
+
+.shelf-left-text h2,
+.shelf-right-text h2 {
+  font-size: 1.75rem;
+  margin-bottom: 0.5rem;
+  color: var(--color-text-primary);
+}
+
+.shelf-left-text p,
+.shelf-right-text p {
+  font-size: 1rem;
+  line-height: 1.4;
+}
+
+.shelf-main-content span {
+  font-family: var(--secondary-font);
+  text-transform: uppercase;
+  font-size: 0.75rem;
+}
+
+/* Books Section (center column) */
+.shelf-books-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 4rem;
+}
+
+/* Book Item Styles */
+.shelf-books__item {
+  text-align: center;
+  cursor: default;
+}
+
+.shelf-books__container {
+  position: relative;
+  width: 220px;
+  margin: 0 auto;
+}
+
+.shelf-books__cover {
+  position: relative;
+  will-change: transform;
+}
+
+.shelf-books__hitbox {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  z-index: 10;
+  cursor: pointer;
+}
+
+/* Back Cover: 96% with 2% margin */
+.shelf-books__back-cover {
+  position: absolute;
+  width: 96%;
+  height: 96%;
+  top: 2%;
+  left: 2%;
+  background: var(--backcover-bg);
+  border-radius: 0 6px 6px 0;
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.4);
+  z-index: -10;
+}
+
+/* Paper Container: 90% with equal top/bottom margin */
+.shelf-books__inside {
+  position: absolute;
+  width: 90%;
+  height: 94%;
+  top: 3%;
+  left: 5%;
+  z-index: 0;
+}
+
+/* Paper Pages: height is 100% */
+.shelf-books__page {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 98%;
+  height: 100%;
+  background: var(--paper-bg);
+  border: var(--paper-border);
+  border-radius: 0 6px 6px 0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+  transform-origin: right center;
+  z-index: -5;
+}
+
+/* Initial stacking: pages start at 0 offset (fully stacked) */
+.shelf-books__page:nth-child(1) { transform: translateX(0px);}
+.shelf-books__page:nth-child(2) { transform: translateX(0px);}
+.shelf-books__page:nth-child(3) { transform: translateX(0px);}
+
+/* Front Cover Image */
+.shelf-books__image {
+  line-height: 0;
+  position: relative;
+  border-radius: 2px 6px 6px 2px;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15), 0 30px 45px rgba(0, 0, 0, 0.12),
+    0 60px 80px rgba(0, 0, 0, 0.1);
+  transform: perspective(2000px) rotateY(0deg) translateX(0px) scaleX(1);
+  transform-style: preserve-3d;
+  transform-origin: left center;
+  cursor: pointer;
+  will-change: transform;
+  z-index: 10;
+}
+
+.shelf-books__image img {
+  width: 100%;
+  border-radius: 2px 6px 6px 2px;
+}
+
+.shelf-books__effect {
+  position: absolute;
+  width: 20px;
+  height: 100%;
+  margin-left: 16px;
+  top: 0;
+  border-left: 2px solid #00000010;
+  background-image: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.2) 0%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  transform-origin: left center;
+  z-index: 5;
+  pointer-events: none;
+}
+
+.shelf-books__light {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  border-radius: 2px 6px 6px 2px;
+  background-image: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.5) 100%
+  );
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  opacity: 0.15;
+  transform-origin: left center;
+  z-index: 4;
+  pointer-events: none;
+  mix-blend-mode: overlay;
+}
+
+.shelf-books__title {
+  margin-top: 0.75rem;
+  text-align: center;
+  font-weight: 300;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+/* Bottom Center: Coordinates */
+.shelf-bottom-center {
+  grid-column: 1 / -1;
+  grid-row: 4;
+  text-align: center;
+  font-size: 1rem;
+  margin-top: 2rem;
+  color: var(--color-text-primary);
+}
+
+/* View All Button Row - keep button close to books */
+.shelf-view-all-row {
+  grid-column: 1 / -1;
+  grid-row: 3;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 1.5rem;
+  margin-bottom: 0;
+}
+
+.cssbuttons-io-button {
+  background: #000000;
+  color: white;
+  font-family: inherit;
+  padding: 0.35em;
+  padding-left: 1.2em;
+  font-size: 17px;
+  font-weight: 500;
+  border-radius: 0.9em;
+  border: none;
+  letter-spacing: 0.05em;
+  display: flex;
+  align-items: center;
+  box-shadow: inset 0 0 1.6em -0.6em #714da6;
+  overflow: hidden;
+  position: relative;
+  height: 2.8em;
+  padding-right: 3.3em;
+  cursor: pointer;
+}
+
+.cssbuttons-io-button .icon {
+  background: white;
+  margin-left: 1em;
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 2.2em;
+  width: 2.2em;
+  border-radius: 0.7em;
+  box-shadow: 0.1em 0.1em 0.6em 0.2em #000000;
+  right: 0.3em;
+  transition: all 0.3s;
+}
+
+.cssbuttons-io-button:hover .icon {
+  width: calc(100% - 0.6em);
+}
+
+.cssbuttons-io-button .icon svg {
+  width: 1.1em;
+  transition: transform 0.3s;
+  color: #000000;
+}
+
+.cssbuttons-io-button:hover .icon svg {
+  transform: translateX(0.1em);
+}
+
+.cssbuttons-io-button:active .icon {
+  transform: scale(0.95);
+}
+
+.shelf-view-all-btn {
+  background: #000000;
+  color: #fff;
+  font-size: 1rem;
+  padding: 0.75rem 2rem;
+  border: none;
+  border-radius: 24px;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+  transition: background 0.2s, box-shadow 0.2s;
+}
+.shelf-view-all-btn:hover {
+  background: #000000;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+}

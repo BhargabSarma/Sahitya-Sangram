@@ -1,0 +1,24 @@
+/* Book cover hover effect */
+.book-cover-hover {
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+.book-cover-hover:hover {
+    transform: scale(1.04);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.18);
+}
+
+/* Responsive fix for book cover on small screens */
+@media (max-width: 768px) {
+    .book-cover-hover img {
+        width: 140px !important;
+        height: 200px !important;
+    }
+}
+
+/* Remove default body margin/padding for consistency */
+body {
+    margin: 0;
+    padding: 100px;
+    background: #f7f8fa;
+    font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+}

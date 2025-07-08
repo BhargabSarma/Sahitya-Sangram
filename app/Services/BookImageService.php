@@ -1,0 +1,30 @@
+<?php
+
+namespace App\Services;
+
+use Spatie\PdfToImage\Pdf;
+use Intervention\Image\Facades\Image;
+use Intervention\Image\ImageManager;
+use Illuminate\Support\Facades\Log;
+
+
+class BookImageService
+{
+
+
+
+    // Converts PDF to images (no watermark)
+    public function convertPdfToImages($pdfPath, $outputDir)
+    {
+        if (!file_exists($outputDir)) {
+            mkdir($outputDir, 0775, true);
+        }
+        try {
+            $pdf = new Pdf($pdfPath);
+            $pdf->saveAllPages($outputDir);
+        } catch (\Exception $e) {
+            Log::error("Failed to convert PDF to images: " . $e->getMessage());
+            throw $e; // Rethrow to let the job handle it
+        }
+    }
+}
