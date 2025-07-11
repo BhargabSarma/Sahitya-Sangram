@@ -27,7 +27,7 @@ class BookController extends Controller
      * Show the form for creating a new resource.
      */
     // Show add book form
-    public function create()
+    public function create(Request $request)
     {
         $categories = [
             'Fiction',
@@ -42,7 +42,11 @@ class BookController extends Controller
             'Education'
         ];
         $authors = Author::all(); // Add this line to fetch authors
-        return view('admin.books.create', compact('categories', 'authors'));
+        $book = null;
+        if ($request->has('book')) {
+            $book = Book::find($request->input('book'));
+        }
+        return view('admin.books.create', compact('categories', 'authors', 'book'));
     }
 
     // Store new book in DB
@@ -81,7 +85,8 @@ class BookController extends Controller
         // Dispatch the job
         ProcessBookPdfJob::dispatch($book->id);
 
-        return redirect()->route('admin.books.create')->with('success', 'Book added! PDF is being processed.');
+        return redirect()->route('admin.books.create', ['book' => $book->id])
+            ->with('success', 'Book added! PDF is being processed.');
     }
     /**
      * Display the specified resource.

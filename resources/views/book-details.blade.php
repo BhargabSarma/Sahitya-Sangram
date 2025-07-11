@@ -18,8 +18,6 @@
     <!-- TailwindCSS (if you use Tailwind utility classes) -->
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<!-- Add other CSS as needed -->
-</head>
 
 <body>
     @include('components.header')
@@ -49,6 +47,11 @@
                         class="w-full px-4 py-2 rounded-lg bg-indigo-600 text-white font-semibold hover:bg-indigo-700 transition mt-4"
                         data-book-id="{{ $book['id'] }}" type="button">
                         Add to Cart
+                    </button>
+                    <button id="buy-now-btn"
+                        class="w-full px-4 py-2 rounded-lg bg-green-600 text-white font-semibold hover:bg-green-700 transition mt-2"
+                        data-book-id="{{ $book['id'] }}" type="button">
+                        Buy Now
                     </button>
                 </div>
             </div>
@@ -144,7 +147,23 @@
             })
                 .then(response => response.json())
                 .then(data => {
-                    document.getElementById('cart-count').textContent = data.cart_count;
+                    if (data.cart_count !== undefined) {
+                        document.getElementById('cart-count').textContent = data.cart_count;
+                    }
+                });
+        });
+
+        document.getElementById('buy-now-btn').addEventListener('click', function () {
+            const bookId = this.getAttribute('data-book-id');
+            fetch('{{ url('/cart/add') }}/' + bookId, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Accept': 'application/json'
+                }
+            })
+                .then(response => {
+                    window.location.href = '{{ route('order.checkout') }}';
                 });
         });
     </script>

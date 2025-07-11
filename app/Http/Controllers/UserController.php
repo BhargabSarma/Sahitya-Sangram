@@ -41,8 +41,17 @@ class UserController extends Controller
         $incomingData = $request->validate([
             'name' => ['required', 'min:3', 'max:50'],
             'email' => ['required', 'email', 'max:100', 'unique:users'],
-            'phone' => ['required', 'regex:/^\+?[0-9]{10,15}$/'],
+            'password' => ['required', 'min:6', 'confirmed'],
         ]);
-        return 'Thanks for your submission!';
+
+        $user = User::create([
+            'name' => $incomingData['name'],
+            'email' => $incomingData['email'],
+            'password' => Hash::make($incomingData['password']),
+        ]);
+
+        Auth::login($user);
+
+        return redirect()->intended('/');
     }
 }

@@ -1,4 +1,3 @@
-{{-- filepath: resources/views/layouts/admin.blade.php --}}
 <!doctype html>
 <html lang="en">
 
@@ -29,10 +28,7 @@
             </div>
         </div>
     </nav>
-    <div class="container">
-        @yield('content')
-    </div>
-
+    @yield('content')
 </body>
 
 </html>
