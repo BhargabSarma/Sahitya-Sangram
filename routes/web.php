@@ -9,37 +9,45 @@ use App\Http\Controllers\AuthorController;
 use App\Http\Controllers\AdminController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\Auth\SocialAuthController;
+use App\Http\Controllers\CartController;
+use App\Http\Controllers\OrderController;
+
 
 Route::get('/', [AdminController::class, 'index'])->name('index');
-
+// ADMIN Routes
 Route::prefix('admin')->as('admin.')->group(function () {
+
     Route::get('/register', [RegisterController::class, 'showRegisterForm'])->name('register');
     Route::post('/register', [RegisterController::class, 'register']);
 
     Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
     Route::post('/login', [LoginController::class, 'login']);
+
     Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
-    Route::middleware(['auth', 'admin'])->group(function () {
+
+    Route::middleware(['auth', 'admin', 'verify.post.size'])->group(function () {
         Route::get('/dashboard', [BookController::class, 'dashboard'])->name('dashboard');
         Route::resource('books', BookController::class);
-        Route::post('/books/upload', [BookController::class, 'upload'])->name('books.upload');
         Route::get('/books/{id}/check_ready', [BookController::class, 'checkReady'])->name('books.check_ready');
     });
 });
+//Authors Routes
 Route::get('authors/create', [AuthorController::class, 'create'])->name('authors.create');
 Route::post('authors', [AuthorController::class, 'store'])->name('authors.store');
 Route::get('/authors', [AuthorController::class, 'index'])->name('authors');
-
+// Misc Routes
 Route::get('/books/read/{id}', [BookReaderController::class, 'showReader'])->name('books.read');
+
 Route::get('/books/{bookId}/{page}', [BookImageController::class, 'show'])->name('books.page');
+
 Route::get('/bookshelf', [BookController::class, 'bookshelf'])->name('books.bookshelf');
+
 Route::get('/about', function () {
     return view('about');
 })->name('about');
+
 Route::get('/books/{id}', [BookController::class, 'show'])->name('books.show');
-Route::get('/cart', function () {
-    return view('cart');
-})->name('cart');
 
 Route::get('/publish', function () {
     return view('publish');
@@ -51,3 +59,27 @@ Route::post('/login', [UserController::class, 'login']);
 Route::get('/register', [UserController::class, 'showRegisterForm'])->name('register');
 Route::post('/register', [UserController::class, 'register']);
 Route::post('/logout', [UserController::class, 'logout'])->name('logout');
+
+
+// Google
+Route::get('auth/google', [SocialAuthController::class, 'redirectToGoogle']);
+Route::get('auth/google/callback', [SocialAuthController::class, 'handleGoogleCallback']);
+
+// Facebook
+Route::get('auth/facebook', [SocialAuthController::class, 'redirectToFacebook']);
+Route::get('auth/facebook/callback', [SocialAuthController::class, 'handleFacebookCallback']);
+
+// Cart routes (persistent for logged-in users)
+Route::middleware(['auth'])->group(function () {
+    Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
+    Route::post('/cart/add/{book}', [CartController::class, 'add'])->name('cart.add');
+    Route::post('/cart/update/{book}', [CartController::class, 'update'])->name('cart.update');
+    Route::post('/cart/remove/{book}', [CartController::class, 'remove'])->name('cart.remove');
+    Route::post('/cart/clear', [CartController::class, 'clear'])->name('cart.clear');
+
+    // Order routes
+    Route::get('/checkout', [OrderController::class, 'checkout'])->name('order.checkout');
+    Route::post('/order/place', [OrderController::class, 'placeOrder'])->name('order.place');
+    Route::get('/order/confirmation/{order}', [OrderController::class, 'confirmation'])->name('order.confirmation');
+    Route::get('/orders', [OrderController::class, 'history'])->name('order.history');
+});

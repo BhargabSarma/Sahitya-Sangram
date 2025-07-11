@@ -27,7 +27,7 @@ class BookController extends Controller
      * Show the form for creating a new resource.
      */
     // Show add book form
-    public function create()
+    public function create(Request $request)
     {
         $categories = [
             'Fiction',
@@ -42,7 +42,11 @@ class BookController extends Controller
             'Education'
         ];
         $authors = Author::all(); // Add this line to fetch authors
-        return view('admin.books.create', compact('categories', 'authors'));
+        $book = null;
+        if ($request->has('book')) {
+            $book = Book::find($request->input('book'));
+        }
+        return view('admin.books.create', compact('categories', 'authors', 'book'));
     }
 
     // Store new book in DB
@@ -54,9 +58,9 @@ class BookController extends Controller
             'description' => 'nullable|string',
             'category' => 'required|string|max:100',
             'number_of_pages' => 'nullable|integer|min:1',
-            'cover_image_front' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'cover_image_back' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'book_file' => 'required|file|mimes:pdf,epub|max:10240', // <-- changed
+            'cover_image_front' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:10240',
+            'cover_image_back' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:10240',
+            'book_file' => 'required|file|mimes:pdf,epub|max:51200',
             'language' => 'nullable|string|max:50',
             'level' => 'required|in:Beginner,Intermediate,Advanced',
             'is_bestseller' => 'nullable|boolean',
@@ -81,7 +85,8 @@ class BookController extends Controller
         // Dispatch the job
         ProcessBookPdfJob::dispatch($book->id);
 
-        return redirect()->route('admin.books.create')->with('success', 'Book added! PDF is being processed.');
+        return redirect()->route('admin.books.create', ['book' => $book->id])
+            ->with('success', 'Book added! PDF is being processed.');
     }
     /**
      * Display the specified resource.
@@ -112,8 +117,8 @@ class BookController extends Controller
             'price' => 'required|numeric',
 
             'access_type' => 'required|in:purchase,subscription',
-            'cover_image' => 'nullable|image|max:2048',
-            'book_file' => 'required|file|mimes:pdf,epub|max:10240',
+            'cover_image' => 'nullable|image|max:10240',
+            'book_file' => 'required|file|mimes:pdf,epub|max:51200',
         ]);
 
         if ($request->hasFile('cover_image')) {
