@@ -73,8 +73,8 @@
                                 <div class="col-md-3 mb-4">
                                     <div class="card border-0 shadow-sm h-100">
                                         @if($book->cover_image_front)
-                                            <img src="{{ asset('storage/' . $book->cover_image_front) }}" class="card-img-top"
-                                                alt="Cover" style="height: 220px; object-fit: cover;">
+                                            <img src="{{ asset($book->cover_image_front) }}" class="card-img-top" alt="Cover"
+                                                style="height: 220px; object-fit: cover;">
                                         @else
                                             <img src="{{ asset('images/default_cover.jpg') }}" class="card-img-top"
                                                 alt="No Cover" style="height: 220px; object-fit: cover;">

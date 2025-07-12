@@ -4,18 +4,10 @@
   </div>
   <!-- Main Content Row -->
   <div class="shelf-main-content">
-    <!-- Left Creative Text Block -->
-    <div class="shelf-left-text">
-      <h2>The Creative Spark</h2>
-      <p>
-        Rick Rubin shows that creativity ignites from within. Every beat, every brushstroke, and every note is an
-        invitation to explore your inner world.
-      </p>
-    </div>
-    <!-- Books Section (Centered) -->
-    <div class="shelf-books-wrapper">
+    <!-- Books Section (Centered, now full width) -->
+    <div class="shelf-books-wrapper" style="margin-left:auto;margin-right:auto;">
       <!-- Book 1 -->
-      <div class="shelf-books__item">
+      <a href="{{ route('books.show', 1) }}" class="shelf-books__item" style="text-decoration:none;color:inherit;">
         <div class="shelf-books__container">
           <div class="shelf-books__cover">
             <div class="shelf-books__back-cover"></div>
@@ -25,8 +17,11 @@
               <div class="shelf-books__page"></div>
             </div>
             <div class="shelf-books__image">
-              <img src="https://covers.shakespeareandcompany.com/97818388/9781838858636.jpg"
-                alt="Creative Act by Rick Rubin">
+              @if($book->cover_image_front)
+          <img src="{{  asset($book->cover_image_front }}" alt="Front Cover">
+        @else
+          <img src="{{ asset('images/default_cover.jpg') }}" alt="No Cover">
+        @endif
               <div class="shelf-books__effect"></div>
               <div class="shelf-books__light"></div>
             </div>
@@ -37,9 +32,9 @@
           Creative Act<br>
           Rick Rubin
         </div>
-      </div>
+      </a>
       <!-- Book 2 -->
-      <div class="shelf-books__item">
+      <a href="{{ route('books.show', 2) }}" class="shelf-books__item" style="text-decoration:none;color:inherit;">
         <div class="shelf-books__container">
           <div class="shelf-books__cover">
             <div class="shelf-books__back-cover"></div>
@@ -49,8 +44,11 @@
               <div class="shelf-books__page"></div>
             </div>
             <div class="shelf-books__image">
-              <img src="https://covers.shakespeareandcompany.com/97988885/9798888500002.jpg"
-                alt="Psychedelics and Mental Health by Irene de Caso">
+              @if($book->cover_image_front)
+          <img src="{{  asset($book->cover_image_front }}" alt="Front Cover">
+        @else
+          <img src="{{ asset('images/default_cover.jpg') }}" alt="No Cover">
+        @endif
               <div class="shelf-books__effect"></div>
               <div class="shelf-books__light"></div>
             </div>
@@ -61,15 +59,61 @@
           Psychedelics and Mental Health<br>
           Irene de Caso
         </div>
-      </div>
-    </div>
-    <!-- Right Creative Text Block -->
-    <div class="shelf-right-text">
-      <h2>Mindful Transcendence</h2>
-      <p>
-        In exploring the depths of consciousness, new dimensions of healing emerge. Every insight is a step toward
-        transcending ordinary limits.
-      </p>
+      </a>
+      <!-- Book 3 -->
+      <a href="{{ route('books.show', 3) }}" class="shelf-books__item" style="text-decoration:none;color:inherit;">
+        <div class="shelf-books__container">
+          <div class="shelf-books__cover">
+            <div class="shelf-books__back-cover"></div>
+            <div class="shelf-books__inside">
+              <div class="shelf-books__page"></div>
+              <div class="shelf-books__page"></div>
+              <div class="shelf-books__page"></div>
+            </div>
+            <div class="shelf-books__image">
+              @if($book->cover_image_front)
+          <img src="{{  asset($book->cover_image_front }}" alt="Front Cover">
+        @else
+          <img src="{{ asset('images/default_cover.jpg') }}" alt="No Cover">
+        @endif
+              <div class="shelf-books__effect"></div>
+              <div class="shelf-books__light"></div>
+            </div>
+            <div class="shelf-books__hitbox" data-book-index="2"></div>
+          </div>
+        </div>
+        <div class="shelf-books__title">
+          The Power of Now<br>
+          Eckhart Tolle
+        </div>
+      </a>
+      <!-- Book 4 -->
+      <a href="{{ route('books.show', 4) }}" class="shelf-books__item" style="text-decoration:none;color:inherit;">
+        <div class="shelf-books__container">
+          <div class="shelf-books__cover">
+            <div class="shelf-books__back-cover"></div>
+            <div class="shelf-books__inside">
+              <div class="shelf-books__page"></div>
+              <div class="shelf-books__page"></div>
+              <div class="shelf-books__page"></div>
+            </div>
+            <div class="shelf-books__image">
+              @if($book->cover_image_front)
+          <img src="{{ asset($book->cover_image_front }}" alt="Front Cover">
+        @else
+          <img src="{{ asset('images/default_cover.jpg') }}" alt="No Cover">
+        @endif
+              <div class="shelf-books__effect"></div>
+              <div class="shelf-books__light"></div>
+            </div>
+            <div class="shelf-books__hitbox" data-book-index="3"></div>
+          </div>
+        </div>
+        <div class="shelf-books__title">
+          Entering the Way of the Bodhisattva<br>
+          Shantideva
+        </div>
+      </a>
     </div>
   </div>
   <!-- Button right after main content, inside .shelf-container grid -->
