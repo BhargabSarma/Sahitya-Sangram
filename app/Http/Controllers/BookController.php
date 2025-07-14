@@ -98,7 +98,32 @@ class BookController extends Controller
     public function show($id)
     {
         $book = Book::findOrFail($id);
-        return view('book-details', compact('book'));
+
+        // Get all page image paths, sorted by filename for correct order
+        $imageFiles = glob(storage_path("app/books/{$id}/*.jpg"));
+        sort($imageFiles);
+        $totalPages = count($imageFiles);
+
+        // Pick 6 random unique indexes (or all if less than 6)
+        $indexes = $totalPages > 6
+            ? array_rand(array_flip(range(0, $totalPages - 1)), 6)
+            : range(0, $totalPages - 1);
+        if (!is_array($indexes)) $indexes = [$indexes];
+
+        // Build samplePages array
+        $samplePages = [];
+        foreach ($indexes as $i) {
+            $filename = basename($imageFiles[$i]);
+            $samplePages[] = [
+                'number' => $i + 1,
+                'image'  => asset("storage/app/books/{$id}/{$filename}"),
+            ];
+        }
+
+        return view('book-details', [
+            'book' => $book,
+            'samplePages' => $samplePages
+        ]);
     }
 
     /**
