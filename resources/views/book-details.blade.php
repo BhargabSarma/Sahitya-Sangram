@@ -27,7 +27,7 @@
             <div class="flex-shrink-0 flex flex-col items-center md:items-start">
                 <div class="rounded-xl overflow-hidden shadow-lg bg-gray-100 mb-6 book-cover-hover">
                     @if($book->cover_image_front)
-                        <img src="{{ asset($book->cover_image_front}}" alt="{{ $book['title'] }}"
+                        <img src="{{ asset($book->cover_image_front)}}" alt="{{ $book['title'] }}"
                             class="w-48 h-72 object-cover" />
                     @else
                         <img src="{{ asset('images/default_cover.jpg') }}" alt="No Cover" class="w-48 h-72 object-cover" />

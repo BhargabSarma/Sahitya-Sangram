@@ -35,7 +35,7 @@
             @forelse($books as $book)
                 <a href="{{ route('books.show', $book['id']) }}" class="cover-card" title="{{ $book['title'] }}">
                     @if($book->cover_image_front)
-                        <img src="{{  asset($book->cover_image_front }}" class="card-img-top" alt="Front Cover">
+                        <img src="{{  asset($book->cover_image_front) }}" class="card-img-top" alt="Front Cover">
                     @else
                         <img src="{{ asset('images/default_cover.jpg') }}" class="card-img-top" alt="No Cover">
                     @endif

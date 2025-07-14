@@ -12,6 +12,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\Auth\SocialAuthController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\LibraryController;
 
 
 Route::get('/', [AdminController::class, 'index'])->name('index');
@@ -82,4 +83,10 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/order/place', [OrderController::class, 'placeOrder'])->name('order.place');
     Route::get('/order/confirmation/{order}', [OrderController::class, 'confirmation'])->name('order.confirmation');
     Route::get('/orders', [OrderController::class, 'history'])->name('order.history');
+
+    // Library Routes
+
+    Route::get('/library', [LibraryController::class, 'index'])->name('library.index');
+    Route::get('/library/review/{book}', [LibraryController::class, 'reviewForm'])->name('library.review.form');
+    Route::post('/library/review/{book}', [LibraryController::class, 'storeReview'])->name('library.review.store');
 });

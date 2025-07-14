@@ -14,14 +14,20 @@ return new class extends Migration
         Schema::create('books', function (Blueprint $table) {
             $table->id();
             $table->string('title');
-            $table->string('author');
+            $table->string('subtitle')->nullable();
+            $table->foreignId('author_id')->constrained('authors');
             $table->text('description')->nullable();
-            $table->decimal('price', 8, 2);
-            $table->enum('access_type', ['purchase', 'subscription']);
-            $table->string('cover_image')->nullable();
-            $table->string('book_file')->nullable(); // e.g. PDF or EPUB
-            $table->string('category')->nullable();  // optional
-            $table->boolean('available')->default(true);
+            $table->string('category', 100);
+            $table->string('cover_image_front')->nullable();
+            $table->string('cover_image_back')->nullable();
+            $table->string('book_file')->nullable();
+            $table->integer('number_of_pages')->nullable();
+            $table->string('language', 50)->nullable();
+            $table->enum('level', ['Beginner', 'Intermediate', 'Advanced'])->default('Beginner');
+            $table->boolean('is_bestseller')->default(false);
+            $table->decimal('hard_copy_price', 10, 2)->default(0.00);
+            $table->decimal('digital_price', 10, 2)->default(0.00);
+            $table->boolean('is_ready')->default(false);
             $table->timestamps();
         });
     }

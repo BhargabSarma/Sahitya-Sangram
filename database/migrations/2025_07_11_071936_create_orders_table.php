@@ -10,10 +10,10 @@ class CreateOrdersTable extends Migration
     {
         Schema::create('orders', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->foreignId('user_id')->constrained('users');
             $table->decimal('total', 10, 2);
-            $table->string('status')->default('pending'); // pending, paid, failed, cancelled
-            $table->json('shipping_address')->nullable();
+            $table->string('status')->default('pending');
+            $table->longText('shipping_address')->nullable();
             $table->timestamps();
         });
     }
