@@ -48,4 +48,17 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    public function orders()
+    {
+        return $this->hasMany(Order::class);
+    }
+
+    public function libraryBooks()
+    {
+        return Book::whereHas('orderItems.order', function ($q) {
+            $q->where('user_id', $this->id)
+                ->where('status', 'completed');
+        });
+    }
 }

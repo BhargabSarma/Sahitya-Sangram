@@ -13,5 +13,8 @@
         </ul>
         <p><strong>Total:</strong> ₹{{ number_format($order->total, 2) }}</p>
         <p><strong>Status:</strong> {{ ucfirst($order->status) }}</p>
+        <div class="mt-3">
+            <a href="{{ route('payments.show', $order->id) }}" class="btn btn-primary">Proceed to Payment</a>
+        </div>
     </div>
 @endsection

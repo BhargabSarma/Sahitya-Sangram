@@ -3,17 +3,11 @@
 namespace App\Services;
 
 use Spatie\PdfToImage\Pdf;
-use Intervention\Image\Facades\Image;
-use Intervention\Image\ImageManager;
 use Illuminate\Support\Facades\Log;
 
 
 class BookImageService
 {
-
-
-
-    // Converts PDF to images (no watermark)
     public function convertPdfToImages($pdfPath, $outputDir)
     {
         if (!file_exists($outputDir)) {

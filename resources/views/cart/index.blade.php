@@ -4,7 +4,8 @@
     <div class="container">
         <h2>Your Cart</h2>
         @if(session('success'))
-        <div class="alert alert-success">{{ session('success') }}</div>@endif
+            <div class="alert alert-success">{{ session('success') }}</div>
+        @endif
         @if($cart->items->isEmpty())
             <p>Your cart is empty.</p>
         @else
@@ -48,6 +49,7 @@
                 </form>
             </div>
             <div>
+                <!-- Checkout button creates order and sends to payment -->
                 <a href="{{ route('order.checkout') }}" class="btn btn-success">Proceed to Checkout</a>
             </div>
         @endif

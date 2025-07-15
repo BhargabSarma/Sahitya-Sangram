@@ -12,6 +12,8 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\Auth\SocialAuthController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\LibraryController;
+use App\Http\Controllers\PaymentsController;
 
 
 Route::get('/', [AdminController::class, 'index'])->name('index');
@@ -38,6 +40,8 @@ Route::post('authors', [AuthorController::class, 'store'])->name('authors.store'
 Route::get('/authors', [AuthorController::class, 'index'])->name('authors');
 // Misc Routes
 Route::get('/books/read/{id}', [BookReaderController::class, 'showReader'])->name('books.read');
+
+Route::get('/books/{id}/sample', [BookReaderController::class, 'showSample'])->name('books.readSample');
 
 Route::get('/books/{bookId}/{page}', [BookImageController::class, 'show'])->name('books.page');
 
@@ -79,7 +83,21 @@ Route::middleware(['auth'])->group(function () {
 
     // Order routes
     Route::get('/checkout', [OrderController::class, 'checkout'])->name('order.checkout');
+    Route::post('/checkout', [OrderController::class, 'checkout'])->name('order.checkout.post');
     Route::post('/order/place', [OrderController::class, 'placeOrder'])->name('order.place');
     Route::get('/order/confirmation/{order}', [OrderController::class, 'confirmation'])->name('order.confirmation');
     Route::get('/orders', [OrderController::class, 'history'])->name('order.history');
+
+    // Payment routes (add these to complete payment process)
+
+    Route::get('/payments/{order}', [PaymentsController::class, 'show'])->name('payments.show');
+    Route::post('/payments/{order}', [PaymentsController::class, 'pay'])->name('payments.pay');
+    Route::post('/payments/callback', [PaymentsController::class, 'callback'])->name('payments.callback'); // Razorpay webhook/callback (optional)
+
+
+    // Library Routes
+
+    Route::get('/library', [LibraryController::class, 'index'])->name('library.index');
+    Route::get('/library/review/{book}', [LibraryController::class, 'reviewForm'])->name('library.review.form');
+    Route::post('/library/review/{book}', [LibraryController::class, 'storeReview'])->name('library.review.store');
 });

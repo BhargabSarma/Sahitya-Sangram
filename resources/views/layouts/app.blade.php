@@ -16,6 +16,11 @@
                 <a class="nav-link d-inline px-2" href="{{ route('books.bookshelf') }}">Bookshelf</a>
                 <a class="nav-link d-inline px-2" href="{{ route('authors') }}">Authors</a>
                 <a class="nav-link d-inline px-2" href="{{ route('about') }}">About Us</a>
+                @auth
+
+                    <a class="nav-link d-inline px-2" href="{{ route('library.index') }}">Library</a>
+
+                @endauth
             </div>
             <div class="d-flex">
                 @auth

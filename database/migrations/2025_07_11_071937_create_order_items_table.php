@@ -10,8 +10,8 @@ class CreateOrderItemsTable extends Migration
     {
         Schema::create('order_items', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('order_id')->constrained()->onDelete('cascade');
-            $table->foreignId('book_id')->constrained()->onDelete('cascade');
+            $table->foreignId('order_id')->constrained('orders');
+            $table->foreignId('book_id')->constrained('books');
             $table->integer('quantity')->default(1);
             $table->decimal('price', 10, 2);
             $table->timestamps();

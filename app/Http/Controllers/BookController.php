@@ -71,10 +71,14 @@ class BookController extends Controller
 
         $data = $request->all();
         if ($request->hasFile('cover_image_front')) {
-            $data['cover_image_front'] = $request->file('cover_image_front')->store('covers/front', 'public');
+            $filename = $request->file('cover_image_front')->getClientOriginalName();
+            $request->file('cover_image_front')->move(base_path('/storage/images/front'), $filename);
+            $data['cover_image_front'] = 'images/front/' . $filename;
         }
         if ($request->hasFile('cover_image_back')) {
-            $data['cover_image_back'] = $request->file('cover_image_back')->store('covers/back', 'public');
+            $filename = $request->file('cover_image_back')->getClientOriginalName();
+            $request->file('cover_image_back')->move(base_path('/storage/images/back'), $filename);
+            $data['cover_image_back'] = 'images/back/' . $filename;
         }
         $data['is_bestseller'] = $request->has('is_bestseller') ? 1 : 0;
 
@@ -94,7 +98,32 @@ class BookController extends Controller
     public function show($id)
     {
         $book = Book::findOrFail($id);
-        return view('book-details', compact('book'));
+
+        // Get all page image paths, sorted by filename for correct order
+        $imageFiles = glob(storage_path("app/books/{$id}/*.jpg"));
+        sort($imageFiles);
+        $totalPages = count($imageFiles);
+
+        // Pick 6 random unique indexes (or all if less than 6)
+        $indexes = $totalPages > 6
+            ? array_rand(array_flip(range(0, $totalPages - 1)), 6)
+            : range(0, $totalPages - 1);
+        if (!is_array($indexes)) $indexes = [$indexes];
+
+        // Build samplePages array
+        $samplePages = [];
+        foreach ($indexes as $i) {
+            $filename = basename($imageFiles[$i]);
+            $samplePages[] = [
+                'number' => $i + 1,
+                'image'  => asset("storage/app/books/{$id}/{$filename}"),
+            ];
+        }
+
+        return view('book-details', [
+            'book' => $book,
+            'samplePages' => $samplePages
+        ]);
     }
 
     /**
@@ -122,7 +151,7 @@ class BookController extends Controller
         ]);
 
         if ($request->hasFile('cover_image')) {
-            $validated['cover_image'] = $request->file('cover_image')->store('covers', 'public');
+            $validated['cover_image'] = $request->file('cover_image')->store('covers');
         }
 
         if ($request->hasFile('book_file')) {

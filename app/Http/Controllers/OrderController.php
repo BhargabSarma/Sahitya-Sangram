@@ -6,13 +6,15 @@ use App\Models\Order;
 use App\Models\OrderItem;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Models\Cart;
+
 
 class OrderController extends Controller
 {
     public function checkout(Request $request)
     {
-        $cart = session()->get('cart', []);
-        if (empty($cart)) {
+        $cart = Cart::where('user_id', Auth::id())->with('items.book')->first();
+        if (!$cart || $cart->items->isEmpty()) {
             return redirect()->route('cart.index')->with('error', 'Your cart is empty!');
         }
         return view('order.checkout', compact('cart'));
@@ -28,14 +30,14 @@ class OrderController extends Controller
             'address.country' => 'required|string|max:100',
         ]);
 
-        $cart = session()->get('cart', []);
-        if (empty($cart)) {
+        $cart = Cart::where('user_id', Auth::id())->with('items.book')->first();
+        if (!$cart || $cart->items->isEmpty()) {
             return redirect()->route('cart.index')->with('error', 'Your cart is empty!');
         }
 
-        $total = collect($cart)->sum(function ($item) {
-            return $item['price'] * $item['quantity'];
-        });
+        $total = $cart->items->reduce(function ($carry, $item) {
+            return $carry + ($item->book->digital_price * $item->quantity);
+        }, 0);
 
         $order = Order::create([
             'user_id' => Auth::id(),
@@ -44,18 +46,20 @@ class OrderController extends Controller
             'shipping_address' => $request->input('address'),
         ]);
 
-        foreach ($cart as $item) {
+        foreach ($cart->items as $item) {
             OrderItem::create([
                 'order_id' => $order->id,
-                'book_id' => $item['id'],
-                'quantity' => $item['quantity'],
-                'price' => $item['price'],
+                'book_id' => $item->book_id,
+                'quantity' => $item->quantity,
+                'price' => $item->book->digital_price,
             ]);
         }
 
-        session()->forget('cart');
+        $cart->items()->delete();
 
-        return redirect()->route('order.confirmation', $order->id)->with('success', 'Order placed! Proceed to payment.');
+        // Redirect to payment page instead of confirmation
+        return redirect()->route('payments.show', $order->id)
+            ->with('success', 'Order placed! Please complete your payment.');
     }
 
     public function confirmation($orderId)
