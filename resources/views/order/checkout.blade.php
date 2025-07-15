@@ -34,6 +34,26 @@
 
             <form action="{{ route('order.place') }}" method="POST">
                 @csrf
+                <div class="mb-3">
+                    <label>Address Line 1</label>
+                    <input type="text" name="address[line1]" class="form-control" required>
+                </div>
+                <div class="mb-3">
+                    <label>City</label>
+                    <input type="text" name="address[city]" class="form-control" required>
+                </div>
+                <div class="mb-3">
+                    <label>State</label>
+                    <input type="text" name="address[state]" class="form-control" required>
+                </div>
+                <div class="mb-3">
+                    <label>ZIP</label>
+                    <input type="text" name="address[zip]" class="form-control" required>
+                </div>
+                <div class="mb-3">
+                    <label>Country</label>
+                    <input type="text" name="address[country]" class="form-control" required>
+                </div>
                 <button type="submit" class="btn btn-success">Place Order & Pay</button>
             </form>
             <div class="mt-3">
