@@ -17,7 +17,6 @@
                 <a class="nav-link d-inline px-2 text-white" href="{{ route('authors') }}">Authors</a>
                 <a class="nav-link d-inline px-2 text-white" href="{{ route('about') }}">About Us</a>
             </div>
-            <span id="book-process-status" class="ms-3"></span>
             <div class="d-flex">
                 @auth
                     <form action="{{ route('admin.logout') }}" method="POST" class="d-inline">

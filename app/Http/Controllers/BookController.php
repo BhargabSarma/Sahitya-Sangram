@@ -10,6 +10,7 @@ use Spatie\PdfToImage\Pdf;
 use App\Services\BookImageService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\File;
 use App\Jobs\ProcessBookPdfJob;
 
 class BookController extends Controller
@@ -70,15 +71,17 @@ class BookController extends Controller
         ]);
 
         $data = $request->all();
+        $bookName = preg_replace('/[^A-Za-z0-9_\-]/', '_', $request->input('title')); // Sanitize book name
+
         if ($request->hasFile('cover_image_front')) {
-            $filename = $request->file('cover_image_front')->getClientOriginalName();
-            $request->file('cover_image_front')->move(base_path('/storage/images/front'), $filename);
-            $data['cover_image_front'] = 'images/front/' . $filename;
+            $frontFilename = $bookName . '_front.' . $request->file('cover_image_front')->getClientOriginalExtension();
+            $request->file('cover_image_front')->move(base_path('storage/images/front'), $frontFilename);
+            $data['cover_image_front'] = 'images/front/' . $frontFilename;
         }
         if ($request->hasFile('cover_image_back')) {
-            $filename = $request->file('cover_image_back')->getClientOriginalName();
-            $request->file('cover_image_back')->move(base_path('/storage/images/back'), $filename);
-            $data['cover_image_back'] = 'images/back/' . $filename;
+            $backFilename = $bookName . '_back.' . $request->file('cover_image_back')->getClientOriginalExtension();
+            $request->file('cover_image_back')->move(base_path('storage/images/back'), $backFilename);
+            $data['cover_image_back'] = 'images/back/' . $backFilename;
         }
         $data['is_bestseller'] = $request->has('is_bestseller') ? 1 : 0;
 
@@ -86,6 +89,7 @@ class BookController extends Controller
         $data['book_file'] = $request->file('book_file')->store('books');
 
         $book = Book::create($data);
+
         // Dispatch the job
         ProcessBookPdfJob::dispatch($book->id);
 
@@ -168,6 +172,10 @@ class BookController extends Controller
      */
     public function destroy(Book $book)
     {
+        $imageDir = storage_path("app/books/{$book->id}");
+        if (is_dir($imageDir)) {
+            File::deleteDirectory($imageDir);
+        }
         $book->delete();
         return redirect()->route('admin.dashboard')->with('success', 'Book deleted.');
     }
@@ -184,6 +192,10 @@ class BookController extends Controller
     public function checkReady($id)
     {
         $book = Book::findOrFail($id);
-        return response()->json(['ready' => (bool)$book->is_ready]);
+        return response()->json([
+            'ready' => (bool)$book->is_ready,
+            'status' => $book->image_processing_status ?? 'pending',
+            'error' => $book->image_processing_error ?? ''
+        ]);
     }
 }
