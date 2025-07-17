@@ -121,11 +121,10 @@
                             const spinner = document.getElementById('spinner');
                             const progressBar = document.getElementById('book-process-progress-bar');
                             const progressDiv = document.getElementById('book-process-progress');
-                            // Remove previous status classes
                             statusSpan.className = 'fw-bold';
 
-                            // Show progress bar if data.progress available
-                            if (data.progress !== undefined) {
+                            // Show progress bar and % if available
+                            if (typeof data.progress !== "undefined" && data.status === "processing") {
                                 progressDiv.style.display = '';
                                 progressBar.style.width = data.progress + '%';
                                 progressBar.innerText = data.progress + '%';
@@ -140,13 +139,15 @@
                                 document.getElementById('submit-btn').disabled = false;
                                 progressBar.style.width = '100%';
                                 progressBar.innerText = '100%';
+                                progressDiv.style.display = '';
                             } else if (data.status === 'failed') {
                                 statusSpan.innerText = 'Book processing failed: ' + (data.error ? data.error : '');
                                 statusSpan.classList.add('text-danger');
                                 spinner.style.display = 'none';
                                 document.getElementById('submit-btn').disabled = false;
+                                progressDiv.style.display = 'none';
                             } else if (data.status === 'processing') {
-                                statusSpan.innerText = 'Processing book file, please wait...';
+                                statusSpan.innerText = 'Processing book file: ' + (data.progress || 0) + '% completed...';
                                 statusSpan.classList.add('text-warning');
                                 spinner.style.display = '';
                                 document.getElementById('submit-btn').disabled = true;
@@ -156,12 +157,14 @@
                                 statusSpan.classList.add('text-warning');
                                 spinner.style.display = '';
                                 document.getElementById('submit-btn').disabled = true;
+                                progressDiv.style.display = 'none';
                                 setTimeout(() => pollCheckReady(bookId), 3000);
                             } else {
                                 statusSpan.innerText = 'Checking status...';
                                 statusSpan.classList.add('text-warning');
                                 spinner.style.display = '';
                                 document.getElementById('submit-btn').disabled = true;
+                                progressDiv.style.display = 'none';
                                 setTimeout(() => pollCheckReady(bookId), 3000);
                             }
                         })
@@ -170,6 +173,7 @@
                             statusSpan.innerText = 'Error checking status.';
                             statusSpan.className = 'fw-bold text-danger';
                             document.getElementById('spinner').style.display = 'none';
+                            document.getElementById('book-process-progress').style.display = 'none';
                         });
                 }
                 pollCheckReady({{ $book->id }});

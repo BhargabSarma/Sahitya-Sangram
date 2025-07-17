@@ -23,7 +23,7 @@ class Book extends Model
         'author_id',
         'image_processing_status',
         'image_processing_error',
-
+        'progress',
     ];
     public function author()
     {

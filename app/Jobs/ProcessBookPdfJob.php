@@ -43,7 +43,10 @@ class ProcessBookPdfJob implements ShouldQueue
         $book->save();
 
         try {
-            app(BookImageService::class)->convertPdfToImages($pdfPath, $outputDir);
+            app(BookImageService::class)->convertPdfToImages($pdfPath, $outputDir, function ($i, $totalPages) use ($book) {
+                $book->progress = intval((($i + 1) / $totalPages) * 100);
+                $book->save();
+            });
             $book->is_ready = true;
             $book->image_processing_status = 'completed';
             $book->image_processing_error = null;

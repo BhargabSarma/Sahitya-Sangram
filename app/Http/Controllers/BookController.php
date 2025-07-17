@@ -195,7 +195,8 @@ class BookController extends Controller
         return response()->json([
             'ready' => (bool)$book->is_ready,
             'status' => $book->image_processing_status ?? 'pending',
-            'error' => $book->image_processing_error ?? ''
+            'error' => $book->image_processing_error ?? '',
+            'progress' => $book->progress ?? 0
         ]);
     }
 }
