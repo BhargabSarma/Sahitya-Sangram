@@ -1,11 +1,10 @@
 <?php
 
-
 namespace App\Http\Middleware;
 
 use Closure;
-use Illuminate\Http\Request;
 use Illuminate\Http\Exceptions\PostTooLargeException;
+use Illuminate\Http\Request;
 
 class VerifyPostSize
 {

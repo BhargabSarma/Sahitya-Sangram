@@ -2,14 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\Author;
+use Illuminate\Http\Request;
 
 class AuthorController extends Controller
 {
     public function index()
     {
         $authors = Author::all();
+
         return view('authors.index', compact('authors'));
     }
 
@@ -29,6 +30,7 @@ class AuthorController extends Controller
             $data['photo'] = $request->file('photo')->store('authors', 'public');
         }
         Author::create($data);
+
         return redirect()->route('admin.dashboard')->with('success', 'Author added!');
     }
 }

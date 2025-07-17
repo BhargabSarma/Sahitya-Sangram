@@ -4,8 +4,6 @@ namespace App\Jobs;
 
 use App\Models\Book;
 use App\Services\BookImageService;
-use App\Notifications\BookProcessed;
-use App\Models\User;
 use Illuminate\Support\Facades\Log;
 
 class ProcessBookPdfJob implements \Illuminate\Contracts\Queue\ShouldQueue
@@ -22,12 +20,13 @@ class ProcessBookPdfJob implements \Illuminate\Contracts\Queue\ShouldQueue
     public function handle(): void
     {
         $book = Book::findOrFail($this->bookId);
-        $pdfPath = storage_path('app/private/' . $book->book_file);
+        $pdfPath = storage_path('app/private/'.$book->book_file);
         $outputDir = storage_path("app/books/{$book->id}");
 
-        Log::info('PDF Path: ' . $pdfPath);
-        if (!file_exists($pdfPath)) {
-            Log::error("PDF not found: " . $pdfPath);
+        Log::info('PDF Path: '.$pdfPath);
+        if (! file_exists($pdfPath)) {
+            Log::error('PDF not found: '.$pdfPath);
+
             return; // Stop processing if file doesn't exist
         }
 
@@ -36,7 +35,7 @@ class ProcessBookPdfJob implements \Illuminate\Contracts\Queue\ShouldQueue
             $book->is_ready = true;
             $book->save();
         } catch (\Exception $e) {
-            Log::error("PDF conversion failed: " . $e->getMessage());
+            Log::error('PDF conversion failed: '.$e->getMessage());
         }
     }
 }

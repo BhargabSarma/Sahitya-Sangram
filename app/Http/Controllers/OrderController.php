@@ -2,21 +2,21 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Cart;
 use App\Models\Order;
 use App\Models\OrderItem;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Models\Cart;
-
 
 class OrderController extends Controller
 {
     public function checkout(Request $request)
     {
         $cart = Cart::where('user_id', Auth::id())->with('items.book')->first();
-        if (!$cart || $cart->items->isEmpty()) {
+        if (! $cart || $cart->items->isEmpty()) {
             return redirect()->route('cart.index')->with('error', 'Your cart is empty!');
         }
+
         return view('order.checkout', compact('cart'));
     }
 
@@ -31,7 +31,7 @@ class OrderController extends Controller
         ]);
 
         $cart = Cart::where('user_id', Auth::id())->with('items.book')->first();
-        if (!$cart || $cart->items->isEmpty()) {
+        if (! $cart || $cart->items->isEmpty()) {
             return redirect()->route('cart.index')->with('error', 'Your cart is empty!');
         }
 
@@ -65,12 +65,14 @@ class OrderController extends Controller
     public function confirmation($orderId)
     {
         $order = Order::with('items.book')->findOrFail($orderId);
+
         return view('order.confirmation', compact('order'));
     }
 
     public function history()
     {
         $orders = Order::where('user_id', Auth::id())->with('items.book')->latest()->get();
+
         return view('order.history', compact('orders'));
     }
 }

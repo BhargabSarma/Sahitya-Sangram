@@ -24,4 +24,4 @@ class CreateReviewsTable extends Migration
     {
         Schema::dropIfExists('reviews');
     }
-};
+}

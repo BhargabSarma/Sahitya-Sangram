@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\Book;
 
 class BookReaderController extends Controller
@@ -20,9 +19,9 @@ class BookReaderController extends Controller
         $pageCount = count($imageFiles);
 
         return view('read', [
-            'bookId'    => $id,
+            'bookId' => $id,
             'pageCount' => $pageCount,
-            'book'      => $book,
+            'book' => $book,
         ]);
     }
 
@@ -44,7 +43,9 @@ class BookReaderController extends Controller
         } else {
             $indexes = range(0, $totalPages - 1);
         }
-        if (!is_array($indexes)) $indexes = [$indexes];
+        if (! is_array($indexes)) {
+            $indexes = [$indexes];
+        }
 
         // Build samplePages array: each element has 'number' and 'image' (public path)
         $samplePages = [];
@@ -52,12 +53,12 @@ class BookReaderController extends Controller
             $filename = basename($imageFiles[$i]);
             $samplePages[] = [
                 'number' => $i + 1,
-                'image'  => asset("storage/app/books/{$id}/{$filename}"),
+                'image' => asset("storage/app/books/{$id}/{$filename}"),
             ];
         }
 
         return view('read-sample', [
-            'book'        => $book,
+            'book' => $book,
             'samplePages' => $samplePages,
         ]);
     }

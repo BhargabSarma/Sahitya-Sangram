@@ -2,9 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Book;
 use App\Models\Cart;
-use App\Models\CartItem;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -14,12 +12,14 @@ class CartController extends Controller
     protected function getCart()
     {
         $user = Auth::user();
+
         return Cart::firstOrCreate(['user_id' => $user->id]);
     }
 
     public function index()
     {
         $cart = $this->getCart()->load('items.book');
+
         return view('cart.index', compact('cart'));
     }
 
@@ -53,7 +53,7 @@ class CartController extends Controller
         $cart = $this->getCart();
         $item = $cart->items()->where('book_id', $bookId)->first();
         if ($item) {
-            $item->quantity = max(1, (int)$request->input('quantity', 1));
+            $item->quantity = max(1, (int) $request->input('quantity', 1));
             $item->save();
         }
 

@@ -3,10 +3,10 @@
 namespace App\Http\Controllers\Admin\Auth;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use App\Models\User;
-use Illuminate\Support\Facades\Hash;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 
 class RegisterController extends Controller
 {
@@ -31,6 +31,7 @@ class RegisterController extends Controller
             'role' => $request->role,
         ]);
         Auth::login($admin);
+
         return redirect()->route('admin.dashboard');
     }
 }

@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\Book;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Review;
+use Illuminate\Http\Request;
 
 class LibraryController extends Controller
 {
@@ -39,6 +39,7 @@ class LibraryController extends Controller
     public function reviewForm($bookId)
     {
         $book = Book::findOrFail($bookId);
+
         return view('library.review', compact('book'));
     }
 
@@ -55,7 +56,7 @@ class LibraryController extends Controller
             })
             ->exists();
 
-        if (!$hasPurchased) {
+        if (! $hasPurchased) {
             return redirect()->back()->with('error', 'You can only review books you have purchased.');
         }
 
@@ -73,7 +74,7 @@ class LibraryController extends Controller
             return redirect()->back()->with('error', 'You have already reviewed this book.');
         }
 
-        $review = new Review();
+        $review = new Review;
         $review->user_id = $user->id;
         $review->book_id = $bookId;
         $review->order_id = OrderItem::where('book_id', $bookId)

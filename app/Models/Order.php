@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use App\Models\OrderItem;
 
 class Order extends Model
 {
@@ -11,7 +10,7 @@ class Order extends Model
         'user_id',
         'total',
         'status',
-        'shipping_address'
+        'shipping_address',
     ];
 
     protected $casts = [

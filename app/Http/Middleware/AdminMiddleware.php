@@ -4,9 +4,9 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Config;
+use Symfony\Component\HttpFoundation\Response;
 
 class AdminMiddleware
 {
@@ -20,6 +20,7 @@ class AdminMiddleware
         if (Auth::check() && Auth::user()->role === 'admin') {
             // Set session lifetime for admin (e.g., 4 hours)
             Config::set('session.lifetime', 300); // minutes
+
             return $next($request);
         }
         abort(403, 'Unauthorized');

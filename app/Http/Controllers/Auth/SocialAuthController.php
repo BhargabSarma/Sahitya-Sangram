@@ -3,10 +3,10 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use Laravel\Socialite\Facades\Socialite;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
+use Laravel\Socialite\Facades\Socialite;
 
 class SocialAuthController extends Controller
 {
@@ -19,6 +19,7 @@ class SocialAuthController extends Controller
     public function handleGoogleCallback()
     {
         $socialUser = Socialite::driver('google')->user();
+
         return $this->findOrCreateUser($socialUser, 'google');
     }
 
@@ -31,6 +32,7 @@ class SocialAuthController extends Controller
     public function handleFacebookCallback()
     {
         $socialUser = Socialite::driver('facebook')->user();
+
         return $this->findOrCreateUser($socialUser, 'facebook');
     }
 
@@ -41,7 +43,7 @@ class SocialAuthController extends Controller
             ->orWhere('email', $socialUser->getEmail())
             ->first();
 
-        if (!$user) {
+        if (! $user) {
             $user = User::create([
                 'name' => $socialUser->getName() ?? $socialUser->getNickname(),
                 'email' => $socialUser->getEmail(),
@@ -53,6 +55,7 @@ class SocialAuthController extends Controller
         }
 
         Auth::login($user, true);
+
         return redirect()->intended('/dashboard');
     }
 }

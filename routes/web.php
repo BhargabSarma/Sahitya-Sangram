@@ -2,19 +2,18 @@
 
 use App\Http\Controllers\Admin\Auth\LoginController;
 use App\Http\Controllers\Admin\Auth\RegisterController;
-use App\Http\Controllers\BookController;
-use App\Http\Controllers\BookReaderController;
-use App\Http\Controllers\BookImageController;
-use App\Http\Controllers\AuthorController;
 use App\Http\Controllers\AdminController;
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\UserController;
 use App\Http\Controllers\Auth\SocialAuthController;
+use App\Http\Controllers\AuthorController;
+use App\Http\Controllers\BookController;
+use App\Http\Controllers\BookImageController;
+use App\Http\Controllers\BookReaderController;
 use App\Http\Controllers\CartController;
-use App\Http\Controllers\OrderController;
 use App\Http\Controllers\LibraryController;
+use App\Http\Controllers\OrderController;
 use App\Http\Controllers\PaymentsController;
-
+use App\Http\Controllers\UserController;
+use Illuminate\Support\Facades\Route;
 
 Route::get('/', [AdminController::class, 'index'])->name('index');
 // ADMIN Routes
@@ -34,7 +33,7 @@ Route::prefix('admin')->as('admin.')->group(function () {
         Route::get('/books/{id}/check_ready', [BookController::class, 'checkReady'])->name('books.check_ready');
     });
 });
-//Authors Routes
+// Authors Routes
 Route::get('authors/create', [AuthorController::class, 'create'])->name('authors.create');
 Route::post('authors', [AuthorController::class, 'store'])->name('authors.store');
 Route::get('/authors', [AuthorController::class, 'index'])->name('authors');
@@ -64,7 +63,6 @@ Route::get('/register', [UserController::class, 'showRegisterForm'])->name('regi
 Route::post('/register', [UserController::class, 'register']);
 Route::post('/logout', [UserController::class, 'logout'])->name('logout');
 
-
 // Google
 Route::get('auth/google', [SocialAuthController::class, 'redirectToGoogle']);
 Route::get('auth/google/callback', [SocialAuthController::class, 'handleGoogleCallback']);
@@ -93,7 +91,6 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/payments/{order}', [PaymentsController::class, 'show'])->name('payments.show');
     Route::post('/payments/{order}', [PaymentsController::class, 'pay'])->name('payments.pay');
     Route::post('/payments/callback', [PaymentsController::class, 'callback'])->name('payments.callback'); // Razorpay webhook/callback (optional)
-
 
     // Library Routes
 

@@ -22,14 +22,30 @@ class Book extends Model
         'digital_price',
         'author_id',
     ];
+
+    /**
+     * Boot method to register model events
+     */
+    protected static function boot()
+    {
+        parent::boot();
+
+        // When a book is being deleted, also delete its reviews
+        static::deleting(function ($book) {
+            $book->reviews()->delete();
+        });
+    }
+
     public function author()
     {
         return $this->belongsTo(Author::class);
     }
+
     public function categories()
     {
         return $this->belongsToMany(Category::class);
     }
+
     public function reviews()
     {
         return $this->hasMany(Review::class);

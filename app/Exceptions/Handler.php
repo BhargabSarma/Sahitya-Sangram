@@ -1,7 +1,7 @@
 <?php
 
-use Illuminate\Http\Exceptions\PostTooLargeException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Illuminate\Http\Exceptions\PostTooLargeException;
 
 class Handler extends ExceptionHandler
 {
@@ -12,6 +12,7 @@ class Handler extends ExceptionHandler
         if ($exception instanceof PostTooLargeException) {
             return response()->view('errors.post_too_large', [], 413);
         }
+
         return parent::render($request, $exception);
     }
 
