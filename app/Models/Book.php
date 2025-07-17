@@ -21,6 +21,9 @@ class Book extends Model
         'hard_copy_price',
         'digital_price',
         'author_id',
+        'image_processing_status',
+        'image_processing_error',
+        'progress',
     ];
     public function author()
     {
