@@ -54,8 +54,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/CustomEase.min.js"></script>
 
-    <!-- SplitType for animated text lines -->
-    <script src="https://unpkg.com/split-type"></script>
 
     <!-- Your custom JS (should be after all libraries) -->
     <!-- If you have a separate hero parallax JS, include it here -->

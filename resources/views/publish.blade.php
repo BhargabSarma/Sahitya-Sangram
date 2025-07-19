@@ -6,11 +6,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- TailwindCSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Custom CSS -->
     <link rel="stylesheet" href="{{ asset('css/header-hero.css') }}">
     <link rel="stylesheet" href="{{ asset('css/footer.css') }}">
-    <!-- <link rel="stylesheet" href="{{ asset('css/void-cards.css') }}"> -->
-    <link rel="stylesheet" href="{{ asset('css/shelf-books.css') }}">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:400,600,700,800&display=swap">
+    <link rel="stylesheet" href="https://unpkg.com/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+    <!-- Login page custom CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/bs-brain@2.0.4/components/logins/login-12/assets/css/login-12.css">
+        <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <!-- TailwindCSS (if you use Tailwind utility classes) -->
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
         .form {
             background-color: #fff;

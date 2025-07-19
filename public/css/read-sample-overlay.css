@@ -1,0 +1,40 @@
+/* Flipbook container must never be flex or grid! */
+#peek-flipbook, #flipbook {
+    width: 900px;
+    height: 640px;
+    max-width: 98vw;
+    max-height: 75vh;
+    margin: 0 auto;
+    background: #fff;
+    border-radius: 18px;
+    box-shadow: 0 10px 48px rgba(30,41,59,0.16), 0 2px 8px rgba(0,0,0,0.11);
+    position: relative;
+    overflow: hidden;
+    /* The key: */
+    display: block !important;
+}
+
+/* Each page must fill the flipbook, not move, not flex */
+#peek-flipbook .page, #flipbook .page {
+    width: 100%;
+    height: 100%;
+    margin: 0 !important;
+    padding: 0 !important;
+    box-sizing: border-box;
+    background: #fff;
+    font-family: 'Inter', sans-serif;
+    font-size: 1.08rem;
+    position: relative;
+    overflow: hidden;
+    border-radius: 0;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+    transition: box-shadow 0.2s;
+    /* The next lines help for Turn.js v4+ "hard" pages: */
+    /* If you use .hard or .fixed, add: */
+    /* min-width: 100%; min-height: 100%; */
+}
+
+#peek-flipbook .page.even, #flipbook .page.even { background: #f1f5fa; }
+#peek-flipbook .page.odd, #flipbook .page.odd { background: #fff; }
+
+/* Remove flex/grid/center styles from flipbook and page parents! */
