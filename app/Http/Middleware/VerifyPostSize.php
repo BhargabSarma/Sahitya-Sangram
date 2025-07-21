@@ -14,8 +14,8 @@ class VerifyPostSize
      */
     public function handle(Request $request, Closure $next)
     {
-        // Set your max POST size in bytes (e.g., 50MB)
-        $max = 50 * 1024 * 1024; // 50 MB
+        // Set your max POST size in bytes (e.g., 200MB)
+        $max = 200 * 1024 * 1024; // 200 MB
 
         $contentLength = (int) $request->server('CONTENT_LENGTH', 0);
 

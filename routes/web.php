@@ -57,7 +57,7 @@ Route::get('/publish', function () {
     return view('publish');
 })->name('publish');
 
-// User Authentication Routes (add these after your existing routes)
+// User Authentication Routes 
 Route::get('/login', [UserController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [UserController::class, 'login']);
 Route::get('/register', [UserController::class, 'showRegisterForm'])->name('register');
@@ -73,13 +73,15 @@ Route::get('auth/google/callback', [SocialAuthController::class, 'handleGoogleCa
 Route::get('auth/facebook', [SocialAuthController::class, 'redirectToFacebook']);
 Route::get('auth/facebook/callback', [SocialAuthController::class, 'handleFacebookCallback']);
 
-// Cart routes (persistent for logged-in users)
+// Cart routes
+
+Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
+Route::post('/cart/add/{book}', [CartController::class, 'add'])->name('cart.add');
+Route::post('/cart/update/{book}', [CartController::class, 'update'])->name('cart.update');
+Route::post('/cart/remove/{book}', [CartController::class, 'remove'])->name('cart.remove');
+Route::post('/cart/clear', [CartController::class, 'clear'])->name('cart.clear');
+
 Route::middleware(['auth'])->group(function () {
-    Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
-    Route::post('/cart/add/{book}', [CartController::class, 'add'])->name('cart.add');
-    Route::post('/cart/update/{book}', [CartController::class, 'update'])->name('cart.update');
-    Route::post('/cart/remove/{book}', [CartController::class, 'remove'])->name('cart.remove');
-    Route::post('/cart/clear', [CartController::class, 'clear'])->name('cart.clear');
 
     // Order routes
     Route::get('/checkout', [OrderController::class, 'checkout'])->name('order.checkout');

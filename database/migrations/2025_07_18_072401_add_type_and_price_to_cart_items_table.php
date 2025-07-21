@@ -9,8 +9,8 @@ class AddTypeAndPriceToCartItemsTable extends Migration
     public function up()
     {
         Schema::table('cart_items', function (Blueprint $table) {
-            $table->string('type')->after('book_id'); // or after any column as you like
-            $table->decimal('price', 10, 2)->after('type');
+            $table->string('type')->default('hard_copy')->after('book_id'); // or after any column as you like
+            $table->decimal('price', 10, 2)->default(0)->after('type');
         });
     }
 
