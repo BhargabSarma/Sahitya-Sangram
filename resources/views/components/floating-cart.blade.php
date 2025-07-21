@@ -8,3 +8,35 @@
     </svg>
     <span class="font-bold text-lg" id="cart-count">{{ session('cart_count', 0) }}</span>
 </div>
+<script>
+    document.querySelectorAll('.add-to-cart-btn').forEach(btn => {
+        btn.addEventListener('click', function (e) {
+            e.preventDefault();
+            const bookId = this.dataset.bookId;
+            const type = this.dataset.type;   // Make sure your button has data-type
+            const price = this.dataset.price; // Make sure your button has data-price
+
+            fetch(`/cart/add/${bookId}`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ type, price })
+            })
+                .then(res => {
+                    if (res.status === 401) {
+                        window.location.href = '/login';
+                        return;
+                    }
+                    return res.json();
+                })
+                .then(data => {
+                    if (data && data.cart_count !== undefined) {
+                        document.getElementById('cart-count').textContent = data.cart_count;
+                    }
+                });
+        });
+    });
+</script>

@@ -6,7 +6,7 @@
         @if(session('success'))
             <div class="alert alert-success">{{ session('success') }}</div>
         @endif
-        @if($cart->items->isEmpty())
+        @if($cartItems->isEmpty())
             <p>Your cart is empty.</p>
         @else
             <table class="table">
@@ -20,9 +20,9 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach($cart->items as $item)
+                    @foreach($cartItems as $item)
                         <tr>
-                            <td>{{ $item->book->title }}</td>
+                            <td>{{ $item->book?->title ?? 'Unknown' }}</td>
                             <td>
                                 <form action="{{ route('cart.update', $item->book_id) }}" method="POST" class="d-inline">
                                     @csrf
@@ -30,8 +30,12 @@
                                     <button type="submit" class="btn btn-sm btn-primary">Update</button>
                                 </form>
                             </td>
-                            <td>₹{{ number_format($item->book->digital_price, 2) }}</td>
-                            <td>₹{{ number_format($item->book->digital_price * $item->quantity, 2) }}</td>
+                            <td>
+                                ₹{{ number_format($item->book?->digital_price ?? 0, 2) }}
+                            </td>
+                            <td>
+                                ₹{{ number_format(($item->book?->digital_price ?? 0) * $item->quantity, 2) }}
+                            </td>
                             <td>
                                 <form action="{{ route('cart.remove', $item->book_id) }}" method="POST" class="d-inline">
                                     @csrf

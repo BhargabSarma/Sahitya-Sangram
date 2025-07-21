@@ -17,6 +17,15 @@ class CreateReviewsTable extends Migration
             $table->text('comment')->nullable();
             $table->timestamps();
             $table->unique(['user_id', 'book_id']);
+
+            // Enforce referential integrity and cascading delete
+            $table->foreign('book_id')
+                ->references('id')->on('books')
+                ->onDelete('cascade');
+
+            $table->foreign('user_id')
+                ->references('id')->on('users')
+                ->onDelete('cascade');
         });
     }
 

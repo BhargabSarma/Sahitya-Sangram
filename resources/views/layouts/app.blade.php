@@ -24,14 +24,14 @@
             </div>
             <div class="d-flex">
                 @auth
-                    <a class="btn btn-outline-primary me-2" href="{{ route('admin.dashboard') }}">Dashboard</a>
-                    <form action="{{ route('admin.logout') }}" method="POST" class="d-inline">
+
+                    <form action="{{ route('logout') }}" method="POST" class="d-inline">
                         @csrf
                         <button class="btn btn-outline-danger btn-sm">Logout</button>
                     </form>
                 @else
-                    <a class="btn btn-outline-primary me-2" href="{{ route('admin.login') }}">Login</a>
-                    <a class="btn btn-primary" href="{{ route('admin.register') }}">Register</a>
+                    <a class="btn btn-outline-primary me-2" href="{{ route('login') }}">Login</a>
+                    <a class="btn btn-primary" href="{{ route('register') }}">Register</a>
                 @endauth
             </div>
         </div>
