@@ -1,0 +1,373 @@
+/* Import Fonts */
+@import url("https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap");
+@import url("https://fonts.cdnfonts.com/css/cabinet-grotesk");
+
+/* Font-face fallback for Cabinet Grotesk */
+@font-face {
+  font-family: "Cabinet Grotesk";
+  src: url("https://fonts.cdnfonts.com/s/92642/CabinetGrotesk-Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+}
+
+/* Root Variables */
+:root {
+  --container-padding: 2rem;
+  --grid-gap: 1rem;
+  --color-background: #f5f5f0;
+  --color-text-primary: #18191a;
+  --paper-bg: #fff;
+  --paper-border: 1px solid rgba(0, 0, 0, 0.2);
+  --backcover-bg: #111;
+  --circle-1: #ccc;
+  --circle-2: #999;
+  --primary-font: "Inter", sans-serif;
+  --secondary-font: "Cabinet Grotesk", serif;
+  --book-width: 220px;
+  --book-height: 338px;
+}
+
+/* Base Styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background-color: var(--color-background);
+  width: 100vw;
+  min-height: 100vh;
+  overflow-x: hidden;
+  position: relative;
+  font-family: var(--primary-font);
+  letter-spacing: -0.03em;
+  font-weight: 400;
+}
+
+/* Background noise effect */
+body::before {
+  content: "";
+  position: fixed;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: transparent
+    url("http://assets.iceable.com/img/noise-transparent.png") repeat 0 0;
+  background-size: 300px 300px;
+  animation: noise-animation 0.3s steps(5) infinite;
+  opacity: 0.3;
+  will-change: transform;
+  z-index: 100;
+  pointer-events: none;
+}
+
+@keyframes noise-animation {
+  0% { transform: translate(0, 0);}
+  10% { transform: translate(-2%, -3%);}
+  20% { transform: translate(-4%, 2%);}
+  30% { transform: translate(2%, -4%);}
+  40% { transform: translate(-2%, 5%);}
+  50% { transform: translate(-4%, 2%);}
+  60% { transform: translate(3%, 0);}
+  70% { transform: translate(0, 3%);}
+  80% { transform: translate(-3%, 0);}
+  90% { transform: translate(2%, 2%);}
+  100% { transform: translate(1%, 0);}
+}
+
+/* SHELF SECTION STYLES */
+
+.shelf-container {
+  width: 100vw;
+  min-height: 80vh;
+  padding: var(--container-padding);
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  grid-gap: var(--grid-gap);
+  grid-template-rows: auto 1fr auto;
+  position: relative;
+}
+
+.shelf-collections-title {
+  grid-column: 1 / -1;
+  grid-row: 1;
+  text-align: center;
+  font-size: 2rem;
+  font-weight: bold;
+  letter-spacing: 0.05em;
+  color: var(--color-text-primary);
+  margin-bottom: 1.5rem;
+  font-family: var(--secondary-font), sans-serif;
+}
+
+.shelf-collections-title strong {
+  font-weight: bold;
+}
+
+.shelf-main-content {
+  grid-column: 1 / -1;
+  grid-row: 2;
+  display: grid;
+  grid-template-columns: 2fr 6fr 2fr;
+  grid-gap: var(--grid-gap);
+  align-items: center;
+}
+
+.shelf-books-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 4rem;
+}
+
+.shelf-books__item {
+  text-align: center;
+  cursor: pointer;
+}
+
+.shelf-books__container {
+  position: relative;
+  width: var(--book-width);
+  height: var(--book-height);
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.shelf-books__cover {
+  position: relative;
+  will-change: transform;
+  width: var(--book-width);
+  height: var(--book-height);
+}
+
+.shelf-books__hitbox {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  z-index: 10;
+  cursor: pointer;
+}
+
+.shelf-books__back-cover {
+  position: absolute;
+  width: 96%;
+  height: 96%;
+  top: 2%;
+  left: 2%;
+  background: var(--backcover-bg);
+  border-radius: 0 6px 6px 0;
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.4);
+  z-index: -10;
+}
+
+.shelf-books__inside {
+  position: absolute;
+  width: 90%;
+  height: 94%;
+  top: 3%;
+  left: 5%;
+  z-index: 0;
+}
+
+.shelf-books__page {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 98%;
+  height: 100%;
+  background: var(--paper-bg);
+  border: var(--paper-border);
+  border-radius: 0 6px 6px 0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+  transform-origin: right center;
+  z-index: -5;
+}
+
+.shelf-books__page:nth-child(1) { transform: translateX(0px);}
+.shelf-books__page:nth-child(2) { transform: translateX(0px);}
+.shelf-books__page:nth-child(3) { transform: translateX(0px);}
+
+.shelf-books__image {
+  line-height: 0;
+  position: relative;
+  border-radius: 2px 6px 6px 2px;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15), 0 30px 45px rgba(0, 0, 0, 0.12),
+      0 60px 80px rgba(0, 0, 0, 0.1);
+  transform: perspective(2000px) rotateY(0deg) translateX(0px) scaleX(1);
+  transform-style: preserve-3d;
+  transform-origin: left center;
+  cursor: pointer;
+  will-change: transform;
+  z-index: 10;
+  width: var(--book-width);
+  height: var(--book-height);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.shelf-books__image img {
+  width: 100%;
+  height: 100%;
+  border-radius: 2px 6px 6px 2px;
+  object-fit: cover;
+  display: block;
+}
+
+.shelf-books__effect {
+  position: absolute;
+  width: 20px;
+  height: 100%;
+  margin-left: 16px;
+  top: 0;
+  border-left: 2px solid #00000010;
+  background-image: linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0.2) 0%,
+      rgba(255, 255, 255, 0) 100%
+  );
+  transform-origin: left center;
+  z-index: 5;
+  pointer-events: none;
+}
+
+.shelf-books__light {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  border-radius: 2px 6px 6px 2px;
+  background-image: linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0) 0%,
+      rgba(255, 255, 255, 0.5) 100%
+  );
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  opacity: 0.15;
+  transform-origin: left center;
+  z-index: 4;
+  pointer-events: none;
+  mix-blend-mode: overlay;
+}
+
+.shelf-books__title {
+  margin-top: 0.75rem;
+  text-align: center;
+  font-weight: 300;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+/* View All Button Row */
+.shelf-view-all-row {
+  grid-column: 1 / -1;
+  grid-row: 3;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 1.5rem;
+  margin-bottom: 2.5rem;
+}
+
+.cssbuttons-io-button {
+  background: #000000;
+  color: white;
+  font-family: inherit;
+  padding: 0.35em;
+  padding-left: 1.2em;
+  font-size: 17px;
+  font-weight: 500;
+  border-radius: 0.9em;
+  border: none;
+  letter-spacing: 0.05em;
+  display: flex;
+  align-items: center;
+  box-shadow: inset 0 0 1.6em -0.6em #714da6;
+  overflow: hidden;
+  position: relative;
+  height: 2.8em;
+  padding-right: 3.3em;
+  cursor: pointer;
+}
+
+.cssbuttons-io-button .icon {
+  background: white;
+  margin-left: 1em;
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 2.2em;
+  width: 2.2em;
+  border-radius: 0.7em;
+  box-shadow: 0.1em 0.1em 0.6em 0.2em #000000;
+  right: 0.3em;
+  transition: all 0.3s;
+}
+
+.cssbuttons-io-button:hover .icon {
+  width: calc(100% - 0.6em);
+}
+
+.cssbuttons-io-button .icon svg {
+  width: 1.1em;
+  transition: transform 0.3s;
+  color: #000000;
+}
+
+.cssbuttons-io-button:hover .icon svg {
+  transform: translateX(0.1em);
+}
+
+.cssbuttons-io-button:active .icon {
+  transform: scale(0.95);
+}
+
+@media (max-width: 600px) {
+  .shelf-books-wrapper {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;   /* Center the books horizontally */
+    align-items: flex-start;
+    gap: 2rem;                 /* Space between books */
+    margin: 0 auto;
+    padding: 0;
+    max-width: 100vw;
+  }
+  .shelf-books__item {
+    width: 120px !important;
+    min-width: 100px !important;
+    max-width: 120px !important;
+    margin-bottom: 0;
+    flex: 0 0 120px;
+    justify-content: center;
+  }
+  .shelf-books__container,
+  .shelf-books__cover,
+  .shelf-books__image {
+    width: 120px !important;
+    height: 180px !important;
+    min-width: 100px !important;
+    min-height: 150px !important;
+    max-width: 120px !important;
+    max-height: 180px !important;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  /* Only show 2 books on mobile */
+  .shelf-books__item:nth-child(n+4) {
+    display: none !important;
+  }
+}

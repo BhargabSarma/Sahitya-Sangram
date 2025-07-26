@@ -61,7 +61,7 @@ class BookController extends Controller
             'number_of_pages' => 'nullable|integer|min:1',
             'cover_image_front' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:10240',
             'cover_image_back' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:10240',
-            'book_file' => 'required|file|mimes:pdf,epub|max:51200',
+            'book_file' => 'required|file|mimes:pdf,epub|max:2048000',
             'language' => 'nullable|string|max:50',
             'level' => 'required|in:Beginner,Intermediate,Advanced',
             'is_bestseller' => 'nullable|boolean',
@@ -91,7 +91,7 @@ class BookController extends Controller
         $book = Book::create($data);
 
         // Dispatch the job
-        ProcessBookPdfJob::dispatch($book->id);
+        // ProcessBookPdfJob::dispatch($book->id, 1, 25);
 
         return redirect()->route('admin.books.create', ['book' => $book->id])
             ->with('success', 'Book added! PDF is being processed.');
@@ -180,14 +180,7 @@ class BookController extends Controller
         return redirect()->route('admin.dashboard')->with('success', 'Book deleted.');
     }
 
-    /**
-     * Display the user's bookshelf.
-     */
-    public function bookshelf()
-    {
-        $books = Book::all(); // Or filter by user if needed
-        return view('bookshelf', compact('books'));
-    }
+
 
     public function checkReady($id)
     {
@@ -198,5 +191,75 @@ class BookController extends Controller
             'error' => $book->image_processing_error ?? '',
             'progress' => $book->progress ?? 0
         ]);
+    }
+    // BooksController.php
+    
+    //search kora controller + paginate
+public function bookshelf(Request $request)
+{
+    $query = $request->input('q');
+
+    // If no query, just show all books paginated
+    if (!$query) {
+        $books = Book::orderBy('created_at', 'desc')->paginate(12);
+        return view('bookshelf', compact('books', 'query'));
+    }
+
+    // First, try to match books by title
+    $books = Book::where('title', 'like', "%$query%")
+                 ->orderBy('created_at', 'desc')
+                 ->paginate(12);
+
+    // If no books by title, try to match author name
+    if ($books->isEmpty()) {
+        $books = Book::whereHas('author', function($authorQuery) use ($query) {
+                        $authorQuery->where('name', 'like', "%$query%");
+                    })
+                    ->orderBy('created_at', 'desc')
+                    ->paginate(12);
+    }
+
+    return view('bookshelf', compact('books', 'query'));
+}
+
+// For AJAX search
+public function ajaxSearch(Request $request)
+{
+    $query = $request->input('q');
+
+    if (!$query) {
+        $books = Book::orderBy('created_at', 'desc')->limit(15)->get();
+        return view('components.bookshelf-results', compact('books'))->render();
+    }
+
+    // First, try to match books by title
+    $books = Book::where('title', 'like', "%$query%")
+                 ->orderBy('created_at', 'desc')
+                 ->limit(15)
+                 ->get();
+
+    // If no books by title, try to match author name
+    if ($books->isEmpty()) {
+        $books = Book::whereHas('author', function($authorQuery) use ($query) {
+                        $authorQuery->where('name', 'like', "%$query%");
+                    })
+                    ->orderBy('created_at', 'desc')
+                    ->limit(15)
+                    ->get();
+    }
+
+    return view('components.bookshelf-results', compact('books'))->render();
+    }
+    //new 
+    public function startConversion(Book $book)
+    {
+        if ($book->image_processing_status === 'processing' || $book->is_ready) {
+            return back()->with('status', 'Conversion already started or completed.');
+        }
+        ProcessBookPdfJob::dispatch($book->id, 1, 25); // 25 = batch size
+        $book->image_processing_status = 'processing';
+        $book->save();
+    
+        return back()->with('status', 'Conversion started!');
     }
 }

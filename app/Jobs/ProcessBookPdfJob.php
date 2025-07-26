@@ -16,11 +16,20 @@ class ProcessBookPdfJob implements ShouldQueue
     use Dispatchable, InteractsWithQueue, SerializesModels;
 
     protected $bookId;
+    protected $startPage;
+    protected $batchSize;
     public $timeout = 600; // 10 minutes
 
-    public function __construct($bookId)
+    /**
+     * @param int $bookId
+     * @param int $startPage
+     * @param int $batchSize
+     */
+    public function __construct($bookId, $startPage = 1, $batchSize = 25)
     {
         $this->bookId = $bookId;
+        $this->startPage = $startPage;
+        $this->batchSize = $batchSize;
     }
 
     public function handle(): void
@@ -29,7 +38,7 @@ class ProcessBookPdfJob implements ShouldQueue
         $pdfPath = storage_path('app/private/' . $book->book_file);
         $outputDir = storage_path("app/books/{$book->id}");
 
-        Log::info('PDF Path: ' . $pdfPath);
+        Log::info("PDF Path: $pdfPath | OutputDir: $outputDir | startPage: {$this->startPage} | batchSize: {$this->batchSize}");
         if (!file_exists($pdfPath)) {
             Log::error("PDF not found: " . $pdfPath);
             $book->image_processing_status = 'failed';
@@ -43,14 +52,28 @@ class ProcessBookPdfJob implements ShouldQueue
         $book->save();
 
         try {
-            app(BookImageService::class)->convertPdfToImages($pdfPath, $outputDir, function ($i, $totalPages) use ($book) {
-                $book->progress = intval((($i + 1) / $totalPages) * 100);
+            $result = app(BookImageService::class)->convertPdfToImagesBatch(
+                $pdfPath,
+                $outputDir,
+                $this->startPage,
+                $this->batchSize,
+                function ($page, $totalPages) use ($book) {
+                    $book->progress = intval((($page) / $totalPages) * 100);
+                    $book->conversion_last_page = $page;
+                    $book->save();
+                }
+            );
+
+            if ($result['lastPage'] < $result['totalPages']) {
+                // Dispatch next batch
+                ProcessBookPdfJob::dispatch($this->bookId, $result['lastPage'] + 1, $this->batchSize);
+            } else {
+                $book->is_ready = true;
+                $book->image_processing_status = 'completed';
+                $book->progress = 100;
+                $book->image_processing_error = null;
                 $book->save();
-            });
-            $book->is_ready = true;
-            $book->image_processing_status = 'completed';
-            $book->image_processing_error = null;
-            $book->save();
+            }
         } catch (Exception $e) {
             Log::error("PDF conversion failed: " . $e->getMessage());
             $book->image_processing_status = 'failed';

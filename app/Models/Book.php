@@ -21,9 +21,6 @@ class Book extends Model
         'hard_copy_price',
         'digital_price',
         'author_id',
-        'image_processing_status',
-        'image_processing_error',
-        'progress',
     ];
     public function author()
     {
@@ -32,9 +29,5 @@ class Book extends Model
     public function categories()
     {
         return $this->belongsToMany(Category::class);
-    }
-    public function reviews()
-    {
-        return $this->hasMany(Review::class);
     }
 }

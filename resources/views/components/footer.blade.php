@@ -1,6 +1,6 @@
 <footer id="footer">
   <div class="col col1">
-    <h3>BookNest</h3>
+    <h3>Sahityaa Sangamm</h3>
     <p>Made with <span style="color: #BA6573;">❤</span> by Scabbardtech</p>
     <!-- <div class="social">
       <a href="https://codepen.io/Juxtopposed" target="_blank" class="link" title="CodePen">

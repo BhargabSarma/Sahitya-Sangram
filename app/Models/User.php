@@ -6,6 +6,9 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use App\Models\Cart;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+
 
 class User extends Authenticatable
 {
@@ -18,7 +21,6 @@ class User extends Authenticatable
      * @var list<string>
      */
     protected $fillable = [
-
         'name',
         'email',
         'password',
@@ -49,6 +51,12 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+    /**cart usert add kora hoise
+     * */
+    public function cart(): HasOne
+    {
+        return $this->hasOne(Cart::class);
+    }
 
     public function orders()
     {
@@ -61,5 +69,15 @@ class User extends Authenticatable
             $q->where('user_id', $this->id)
                 ->where('status', 'completed');
         });
+    }
+
+    public function addresses()
+    {
+        return $this->hasMany(Address::class);
+    }
+
+    public function defaultAddress()
+    {
+        return $this->hasOne(Address::class)->where('is_default', true);
     }
 }

@@ -14,9 +14,11 @@ use App\Http\Controllers\CartController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\LibraryController;
 use App\Http\Controllers\PaymentsController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\HomeController;
 
 
-Route::get('/', [AdminController::class, 'index'])->name('index');
+Route::get('/', [HomeController::class, 'index'])->name('index');
 // ADMIN Routes
 Route::prefix('admin')->as('admin.')->group(function () {
 
@@ -32,6 +34,11 @@ Route::prefix('admin')->as('admin.')->group(function () {
         Route::get('/dashboard', [BookController::class, 'dashboard'])->name('dashboard');
         Route::resource('books', BookController::class);
         Route::get('/books/{id}/check_ready', [BookController::class, 'checkReady'])->name('books.check_ready');
+        //new route
+        Route::post('/books/{book}/start-conversion', [BookController::class, 'startConversion'])->name('books.startConversion');
+        // Import from FTP routes
+        Route::get('/import-from-ftp', [BookController::class, 'showImportFromFtp'])->name('importFromFtp');
+        Route::post('/import-from-ftp', [BookController::class, 'importFromFtp'])->name('importFromFtp.post');
     });
 });
 //Authors Routes
@@ -46,6 +53,8 @@ Route::get('/books/{id}/sample', [BookReaderController::class, 'showSample'])->n
 Route::get('/books/{bookId}/{page}', [BookImageController::class, 'show'])->name('books.page');
 
 Route::get('/bookshelf', [BookController::class, 'bookshelf'])->name('books.bookshelf');
+// search kora route 
+Route::get('/books/search', [BookController::class, 'ajaxSearch'])->name('books.ajaxSearch');
 
 Route::get('/about', function () {
     return view('about');
@@ -65,6 +74,7 @@ Route::post('/register', [UserController::class, 'register']);
 Route::post('/logout', [UserController::class, 'logout'])->name('logout');
 
 
+
 // Google
 Route::get('auth/google', [SocialAuthController::class, 'redirectToGoogle']);
 Route::get('auth/google/callback', [SocialAuthController::class, 'handleGoogleCallback']);
@@ -82,7 +92,14 @@ Route::post('/cart/remove/{book}', [CartController::class, 'remove'])->name('car
 Route::post('/cart/clear', [CartController::class, 'clear'])->name('cart.clear');
 
 Route::middleware(['auth'])->group(function () {
-
+    Route::get('/profile/addresses', [ProfileController::class, 'index'])->name('profile.addresses.index');
+    Route::get('/profile/addresses/create', [ProfileController::class, 'create'])->name('profile.addresses.create');
+    Route::post('/profile/addresses', [ProfileController::class, 'store'])->name('profile.addresses.store');
+    Route::post('/profile/addresses/{address}/set-default', [ProfileController::class, 'setDefault'])->name('profile.addresses.set-default');
+    Route::get('/profile/addresses/{address}/edit', [ProfileController::class, 'edit'])->name('profile.addresses.edit');
+    Route::put('/profile/addresses/{address}', [ProfileController::class, 'update'])->name('profile.addresses.update');
+    Route::delete('/profile/addresses/{address}', [ProfileController::class, 'destroy'])->name('profile.addresses.destroy');
+    Route::get('/profile', [ProfileController::class, 'show'])->name('profile.show');
     // Order routes
     Route::get('/checkout', [OrderController::class, 'checkout'])->name('order.checkout');
     Route::post('/checkout', [OrderController::class, 'checkout'])->name('order.checkout.post');

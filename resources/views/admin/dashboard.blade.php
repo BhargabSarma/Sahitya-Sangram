@@ -1,151 +1,252 @@
-<!doctype html>
-<html lang="en">
+@extends('layouts.admin')
 
-<head>
-    <meta charset="UTF-8">
-    <title>Admin Dashboard</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        body {
-            background: #f6f9fc;
-        }
+@section('title', 'Admin Dashboard')
 
-        .dashboard-header {
-            background: linear-gradient(90deg, #007bff 0%, #0056b3 100%);
-            color: #fff;
-            padding: 30px 0 20px 0;
-            border-radius: 0 0 24px 24px;
-            margin-bottom: 32px;
-        }
+@push('styles')
+<style>
+    .dashboard-header h1 {
+        color: #2c3e50;
+        font-weight: 600;
+    }
 
-        .card {
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-        }
+    .dashboard-header p {
+        color: #718096;
+    }
 
-        .add-btn {
-            float: right;
-        }
-    </style>
-</head>
+    .stat-card {
+        background-color: #fff;
+        border-radius: 12px;
+        padding: 25px;
+        display: flex;
+        align-items: center;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
 
-<body>
-    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
-        <div class="container">
-            <a class="navbar-brand fw-bold" href="#">📚 Book Retail System</a>
-            <div class="d-flex align-items-center">
-                <span class="me-3 text-secondary">
-                    <i class="bi bi-person-circle"></i> Hello, <strong>{{ Auth::user()->name }}</strong>
-                </span>
-                <span id="book-process-status" class="ms-3"></span>
-                <form action="{{ route('admin.logout') }}" method="POST" class="d-inline">
-                    @csrf
-                    <button type="submit" class="btn btn-outline-danger btn-sm">Logout</button>
-                </form>
-            </div>
-        </div>
-    </nav>
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+    }
 
-    <div class="dashboard-header text-center">
-        <h1 class="display-5 fw-bold">Welcome, {{ Auth::user()->name }} 👋</h1>
-        <p class="lead mb-0">Manage your bookstore efficiently from the admin dashboard.</p>
+    .stat-card .icon {
+        font-size: 2.5rem;
+        width: 60px;
+        height: 60px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        margin-right: 20px;
+    }
+
+    .stat-card .icon.icon-books {
+        background-color: #eaf5ff;
+        color: #3498db;
+    }
+
+    .stat-card .icon.icon-authors {
+        background-color: #e8f6f3;
+        color: #1abc9c;
+    }
+    
+    .stat-card .icon.icon-users {
+        background-color: #fef5e7;
+        color: #f39c12;
+    }
+
+    .stat-card .info .number {
+        font-size: 2rem;
+        font-weight: 600;
+        color: #2c3e50;
+    }
+
+    .stat-card .info .title {
+        font-size: 1rem;
+        color: #718096;
+    }
+
+    .management-card {
+        background-color: #fff;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    }
+
+    .management-card .card-header {
+        background-color: transparent;
+        border-bottom: 1px solid #f0f0f0;
+        padding: 1.25rem 1.5rem;
+    }
+
+    .management-card .card-header h5 {
+        margin: 0;
+        font-weight: 600;
+        color: #2c3e50;
+    }
+
+    .table-responsive {
+        border: none;
+    }
+
+    .table thead th {
+        background-color: #f9fafb;
+        border-bottom: 2px solid #e5e7eb;
+        font-weight: 600;
+        color: #4a5568;
+        font-size: 0.875rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .table td, .table th {
+        vertical-align: middle;
+    }
+
+    .table .book-cover {
+        width: 45px !important;
+        height: 65px !important;
+        object-fit: cover !important;
+        border-radius: 4px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .action-btns .btn {
+        margin: 0 2px;
+        padding: 0.3rem 0.6rem;
+    }
+</style>
+@endpush
+
+@section('content')
+    <!-- Dashboard Header -->
+    <div class="dashboard-header mb-4">
+        <h1>Welcome, {{ Auth::user()->name }} 👋</h1>
+        <p>Here's an overview of your bookstore's activity.</p>
     </div>
 
-    <div class="container mb-5">
-        <div class="row justify-content-center">
-            <div class="col-lg-8 mb-4">
-                <div class="card">
-                    <div class="card-body">
-                        <h5>
-                            <span class="me-2">Your Role:</span>
-                            <span class="badge bg-info text-dark">{{ ucfirst(Auth::user()->role) }}</span>
-                            <a href="{{ route('authors.create') }}" class="btn btn-secondary btn-sm add-btn ms-2">
-                                <i class="bi bi-person-plus"></i> Add Author
-                            </a>
-                            <a href="{{ route('admin.books.create') }}" class="btn btn-primary btn-sm add-btn">
-                                <i class="bi bi-plus-circle"></i> Add Book
-                            </a>
-                        </h5>
-                        <hr>
-
-                        <!-- Dashboard content can be added here -->
-                        <div class="row text-center py-4">
-                            @forelse($books as $book)
-                                <div class="col-md-3 mb-4">
-                                    <div class="card border-0 shadow-sm h-100">
-                                        @if($book->cover_image_front)
-                                            <img src="{{ asset('storage/images/' . $book->cover_image_front) }}"
-                                                class="card-img-top" alt="Cover" style="height: 220px; object-fit: cover;">
-                                        @else
-                                            <img src="{{ asset('images/default_cover.jpg') }}" class="card-img-top"
-                                                alt="No Cover" style="height: 220px; object-fit: cover;">
-                                        @endif
-                                        <div class="card-body">
-                                            <h5 class="card-title">{{ $book->title }}</h5>
-                                            <a href="{{ route('books.read', ['id' => $book->id]) }}"
-                                                class="btn btn-outline-primary btn-sm mt-2">View</a>
-                                            <a href="{{ route('admin.books.edit', $book->id) }}"
-                                                class="btn btn-outline-warning btn-sm mt-2 ms-1">Edit</a>
-                                            <form action="{{ route('admin.books.destroy', $book->id) }}" method="POST"
-                                                class="d-inline">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button class="btn btn-outline-danger btn-sm mt-2 ms-1"
-                                                    onclick="return confirm('Are you sure you want to delete this book?')">Delete</button>
-                                            </form>
-                                        </div>
-                                    </div>
-                                </div>
-                            @empty
-                                <div class="col-12">
-                                    <p>No books found.</p>
-                                </div>
-                            @endforelse
-                        </div>
-                        <!-- More widgets/management links can be added here -->
-                    </div>
+    <!-- Stat Cards -->
+    <div class="row mb-4">
+        <div class="col-lg-4 col-md-6 mb-4">
+            <div class="stat-card">
+                <div class="icon icon-books">
+                    <i class="fas fa-book"></i>
+                </div>
+                <div class="info">
+                    {{-- To make this work, you must pass $bookCount from your controller --}}
+                    <div class="number">{{ $bookCount ?? 0 }}</div>
+                    <div class="title">Total Books</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4 col-md-6 mb-4">
+            <div class="stat-card">
+                <div class="icon icon-authors">
+                    <i class="fas fa-user-edit"></i>
+                </div>
+                <div class="info">
+                     {{-- To make this work, you must pass $authorCount from your controller --}}
+                    <div class="number">{{ $authorCount ?? 0 }}</div>
+                    <div class="title">Total Authors</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4 col-md-6 mb-4">
+            <div class="stat-card">
+                <div class="icon icon-users">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div class="info">
+                     {{-- To make this work, you must pass $userCount from your controller --}}
+                    <div class="number">{{ $userCount ?? 0 }}</div>
+                    <div class="title">Total Users</div>
                 </div>
             </div>
         </div>
     </div>
-    <!-- Bootstrap Icons CDN for icons (optional) -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.js"></script>
-</body>
 
-</html>
-{{--
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <title>Admin Dashboard</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/chart.js/dist/Chart.min.css">
-</head>
-
-<body class="bg-gray-100 flex">
-    @include('admin.components.sidebar')
-    <div id="mainContent" class="flex-1 ml-64 p-8">
-        <h1 class="text-2xl font-bold mb-8">Dashboard</h1>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <div class="bg-white rounded-lg shadow p-6">
-                <h2 class="font-semibold mb-4">Total Sales</h2>
-                <canvas id="totalSalesChart" height="180"></canvas>
-            </div>
-            <div class="bg-white rounded-lg shadow p-6">
-                <h2 class="font-semibold mb-4">Sales Distribution</h2>
-                <canvas id="salesPieChart" height="180"></canvas>
-            </div>
-            <div class="bg-white rounded-lg shadow p-6">
-                <h2 class="font-semibold mb-4">Average Sales</h2>
-                <canvas id="averageSalesChart" height="180"></canvas>
+    <!-- Recent Books Management -->
+    <div class="management-card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="card-title">Recently Added Books</h5>
+            <div>
+                <a href="{{ route('admin.books.create') }}" class="btn btn-primary btn-sm">
+                    <i class="fas fa-plus-circle me-1"></i> Add Book
+                </a>
+                <a href="{{ route('authors.create') }}" class="btn btn-secondary btn-sm">
+                    <i class="fas fa-user-plus me-1"></i> Add Author
+                </a>
             </div>
         </div>
-        <a href="{{ route('admin.dashboard') }}" class="mt-8 inline-block text-blue-600 hover:underline">Go to
-            Dashboard</a>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th class="ps-3">Cover</th>
+                            <th>Title</th>
+                            <th>Author</th>
+                            <th>Price</th>
+                            <th class="text-end pe-3">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse($books as $book)
+                            <tr>
+                                <td class="ps-3">
+                                    @if($book->cover_image_front)
+                                        <img 
+                                            src="{{ asset('storage/'.$book->cover_image_front) }}" 
+                                            alt="Cover" 
+                                            class="book-cover"
+                                            width="45"
+                                            height="65"
+                                            style="width:45px;height:65px;object-fit:cover;"/>
+                                    @else
+                                        <img 
+                                            src="https://placehold.co/45x65/e2e8f0/adb5bd?text=N/A" 
+                                            alt="No Cover" 
+                                            class="book-cover"
+                                            width="45"
+                                            height="65"
+                                            style="width:45px;height:65px;object-fit:cover;"/>
+                                    @endif
+                                </td>
+                                <td>{{ $book->title }}</td>
+                                <td>{{ $book->author->name ?? 'N/A' }}</td>
+                                <td>${{ number_format($book->price ?? 0, 2) }}</td>
+                              <td class="action-btns text-end pe-3">
+                                    <a href="{{ route('books.read', ['id' => $book->id]) }}" class="btn btn-outline-primary btn-sm" title="View"><i class="fas fa-eye"></i></a>
+                                    <a href="{{ route('admin.books.edit', $book->id) }}" class="btn btn-outline-warning btn-sm" title="Edit"><i class="fas fa-edit"></i></a>
+                                    
+                                    {{-- Start Conversion button (only if eligible) --}}
+                                    @if($book->book_file && $book->image_processing_status !== 'processing' && !$book->is_ready)
+                                        <form action="{{ route('admin.books.startConversion', $book->id) }}" method="POST" class="d-inline">
+                                            @csrf
+                                            <button class="btn btn-outline-success btn-sm" title="Start Conversion">
+                                                <i class="fas fa-sync"></i> Start Conversion
+                                            </button>
+                                        </form>
+                                    @endif
+                                
+                                    <form action="{{ route('admin.books.destroy', $book->id) }}" method="POST" class="d-inline">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button class="btn btn-outline-danger btn-sm" title="Delete" onclick="return confirm('Are you sure you want to delete this book?')">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="5" class="text-center py-5">
+                                    <p class="mb-2">No books found.</p>
+                                    <a href="{{ route('admin.books.create') }}" class="btn btn-primary btn-sm">Add your first book</a>
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="{{ asset('js/admin-dashboard.js') }}"></script>
-</body>
-
-</html> --}}
+@endsection
