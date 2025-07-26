@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <title>Publish Your Book With Us</title>
@@ -12,7 +13,7 @@
     <link rel="stylesheet" href="https://unpkg.com/bootstrap@5.3.3/dist/css/bootstrap.min.css">
     <!-- Login page custom CSS -->
     <link rel="stylesheet" href="https://unpkg.com/bs-brain@2.0.4/components/logins/login-12/assets/css/login-12.css">
-        <!-- Font Awesome for icons -->
+    <!-- Font Awesome for icons -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
     <!-- TailwindCSS (if you use Tailwind utility classes) -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -29,16 +30,19 @@
             max-width: 320px;
             margin: 0 auto;
         }
+
         .form-title {
             color: #000000;
             font-size: 1.8rem;
             font-weight: 500;
         }
+
         .form-paragraph {
             margin-top: 10px;
             font-size: 0.9375rem;
             color: rgb(105, 105, 105);
         }
+
         .drop-container {
             background-color: #fff;
             position: relative;
@@ -55,13 +59,16 @@
             cursor: pointer;
             transition: background .2s ease-in-out, border .2s ease-in-out;
         }
+
         .drop-container:hover {
             background: rgba(0, 140, 255, 0.164);
             border-color: rgba(17, 17, 17, 0.616);
         }
+
         .drop-container:hover .drop-title {
             color: #222;
         }
+
         .drop-title {
             color: #444;
             font-size: 20px;
@@ -69,7 +76,9 @@
             text-align: center;
             transition: color .2s ease-in-out;
         }
-        #cover-input, #pdf-input {
+
+        #cover-input,
+        #pdf-input {
             width: 350px;
             max-width: 100%;
             color: #444;
@@ -78,7 +87,9 @@
             border-radius: 10px;
             border: 1px solid rgba(8, 8, 8, 0.288);
         }
-        #cover-input::file-selector-button, #pdf-input::file-selector-button {
+
+        #cover-input::file-selector-button,
+        #pdf-input::file-selector-button {
             margin-right: 20px;
             border: none;
             background: #084cdf;
@@ -88,26 +99,36 @@
             cursor: pointer;
             transition: background .2s ease-in-out;
         }
-        #cover-input::file-selector-button:hover, #pdf-input::file-selector-button:hover {
+
+        #cover-input::file-selector-button:hover,
+        #pdf-input::file-selector-button:hover {
             background: #0d45a5;
         }
     </style>
 </head>
+
 <body>
     @include('components.header')
     <div class="container mx-auto py-32 flex justify-center">
-        <form action="#" method="POST" enctype="multipart/form-data" class="w-full max-w-xl bg-white p-8 rounded-xl shadow-lg space-y-8">
+        <form action="{{ route('author.inquiry.submit') }}" method="POST" enctype="multipart/form-data"
+            class="w-full max-w-xl bg-white p-8 rounded-xl shadow-lg space-y-8">
             @csrf
 
             <!-- Step Progress Bar -->
             <div class="flex flex-col items-center mb-8">
                 <div class="flex items-center w-full max-w-xs mb-2">
                     <div class="flex-1 flex items-center">
-                        <div id="step-indicator-1" class="w-8 h-8 flex items-center justify-center rounded-full bg-indigo-600 text-white font-bold border-4 border-indigo-600 z-10 transition-all duration-300">1</div>
+                        <div id="step-indicator-1"
+                            class="w-8 h-8 flex items-center justify-center rounded-full bg-indigo-600 text-white font-bold border-4 border-indigo-600 z-10 transition-all duration-300">
+                            1</div>
                         <div class="flex-1 h-1 bg-gray-300 mx-1 relative">
-                            <div id="progress-bar" class="absolute left-0 top-0 h-1 bg-indigo-600 rounded transition-all duration-300" style="width: 50%"></div>
+                            <div id="progress-bar"
+                                class="absolute left-0 top-0 h-1 bg-indigo-600 rounded transition-all duration-300"
+                                style="width: 50%"></div>
                         </div>
-                        <div id="step-indicator-2" class="w-8 h-8 flex items-center justify-center rounded-full bg-gray-200 text-gray-700 font-bold border-4 border-gray-200 z-10 transition-all duration-300">2</div>
+                        <div id="step-indicator-2"
+                            class="w-8 h-8 flex items-center justify-center rounded-full bg-gray-200 text-gray-700 font-bold border-4 border-gray-200 z-10 transition-all duration-300">
+                            2</div>
                     </div>
                 </div>
                 <div class="flex justify-between w-full max-w-xs text-xs text-gray-600">
@@ -143,7 +164,8 @@
                         <option value="Comics">Comics</option>
                         <option value="Others">Others</option>
                     </select>
-                    <input type="text" name="category_other" id="category-other" class="w-full border rounded px-3 py-2 mt-2 hidden" placeholder="Please specify category">
+                    <input type="text" name="category_other" id="category-other"
+                        class="w-full border rounded px-3 py-2 mt-2 hidden" placeholder="Please specify category">
                 </div>
                 <!-- Custom styled PDF upload -->
                 <div class="mb-4">
@@ -158,7 +180,8 @@
                     </div>
                 </div>
                 <div class="flex justify-end">
-                    <button type="button" id="next-btn" class="bg-indigo-600 text-white px-6 py-2 rounded hover:bg-indigo-700">Next</button>
+                    <button type="button" id="next-btn"
+                        class="bg-indigo-600 text-white px-6 py-2 rounded hover:bg-indigo-700">Next</button>
                 </div>
             </div>
 
@@ -182,8 +205,10 @@
                     <textarea name="bio" class="w-full border rounded px-3 py-2" rows="3"></textarea>
                 </div>
                 <div class="flex justify-between">
-                    <button type="button" id="back-btn" class="bg-gray-300 text-gray-800 px-6 py-2 rounded hover:bg-gray-400">Back</button>
-                    <button type="submit" class="bg-indigo-600 text-white px-6 py-2 rounded hover:bg-indigo-700">Submit</button>
+                    <button type="button" id="back-btn"
+                        class="bg-gray-300 text-gray-800 px-6 py-2 rounded hover:bg-gray-400">Back</button>
+                    <button type="submit"
+                        class="bg-indigo-600 text-white px-6 py-2 rounded hover:bg-indigo-700">Submit</button>
                 </div>
             </div>
         </form>
@@ -204,8 +229,8 @@
     <!-- If you have a separate hero parallax JS, include it here -->
     <script src="{{ asset('js/index.js') }}"></script>
     <script src="{{ asset('js/hero-gsap.js') }}"></script>
-    
-    
+
+
     @include('components.footer')
     <script>
         // Stepper logic and progress bar
@@ -217,7 +242,7 @@
         const stepIndicator1 = document.getElementById('step-indicator-1');
         const stepIndicator2 = document.getElementById('step-indicator-2');
 
-        nextBtn.addEventListener('click', function() {
+        nextBtn.addEventListener('click', function () {
             step1.classList.add('hidden');
             step2.classList.remove('hidden');
             progressBar.style.width = '100%';
@@ -227,7 +252,7 @@
             stepIndicator2.classList.add('bg-indigo-600', 'text-white', 'border-indigo-600');
         });
 
-        backBtn.addEventListener('click', function() {
+        backBtn.addEventListener('click', function () {
             step2.classList.add('hidden');
             step1.classList.remove('hidden');
             progressBar.style.width = '50%';
@@ -237,7 +262,7 @@
             stepIndicator1.classList.add('bg-indigo-600', 'text-white', 'border-indigo-600');
         });
 
-        document.getElementById('category-select').addEventListener('change', function() {
+        document.getElementById('category-select').addEventListener('change', function () {
             const otherInput = document.getElementById('category-other');
             if (this.value === 'Others') {
                 otherInput.classList.remove('hidden');
@@ -249,4 +274,5 @@
         });
     </script>
 </body>
+
 </html>

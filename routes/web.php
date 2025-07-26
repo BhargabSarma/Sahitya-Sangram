@@ -16,6 +16,9 @@ use App\Http\Controllers\LibraryController;
 use App\Http\Controllers\PaymentsController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\AuthorInquiryController;
+use App\Http\Controllers\Admin\AdminAuthorInquiryController;
+use App\Http\Controllers\Admin\AdminOrderPaymentController;
 
 
 Route::get('/', [HomeController::class, 'index'])->name('index');
@@ -34,17 +37,38 @@ Route::prefix('admin')->as('admin.')->group(function () {
         Route::get('/dashboard', [BookController::class, 'dashboard'])->name('dashboard');
         Route::resource('books', BookController::class);
         Route::get('/books/{id}/check_ready', [BookController::class, 'checkReady'])->name('books.check_ready');
-        //new route
+
+        //Book Conversion 
         Route::post('/books/{book}/start-conversion', [BookController::class, 'startConversion'])->name('books.startConversion');
+
         // Import from FTP routes
         Route::get('/import-from-ftp', [BookController::class, 'showImportFromFtp'])->name('importFromFtp');
         Route::post('/import-from-ftp', [BookController::class, 'importFromFtp'])->name('importFromFtp.post');
+
+        //Author Inquiry
+        Route::get('/admin/author-inquiries', [AdminAuthorInquiryController::class, 'index'])->name('author.inquiries');
+        Route::get('/admin/author-inquiries/{id}', [AdminAuthorInquiryController::class, 'show'])->name('author.inquiries.show');
+        Route::post('/admin/author-inquiries/{id}/approve', [AdminAuthorInquiryController::class, 'approve'])->name('author.inquiries.approve');
+        Route::post('/admin/author-inquiries/{id}/deny', [AdminAuthorInquiryController::class, 'deny'])->name('author.inquiries.deny');
+        Route::delete('/admin/author-inquiries/{id}', [AdminAuthorInquiryController::class, 'destroy'])->name('author.inquiries.destroy');
+
+        // Order/Payment Admin Routes
+        Route::get('/admin/orders', [AdminOrderPaymentController::class, 'orders'])->name('orders');
+        Route::get('/admin/orders/{id}', [AdminOrderPaymentController::class, 'orderShow'])->name('orders.show');
+        Route::get('/admin/payments', [AdminOrderPaymentController::class, 'payments'])->name('payments');
+        Route::get('/admin/payments/{id}', [AdminOrderPaymentController::class, 'paymentShow'])->name('payments.show');
+        Route::post('/admin/payments/{id}/update-status', [AdminOrderPaymentController::class, 'updatePaymentStatus'])->name('payments.updateStatus');
     });
 });
 //Authors Routes
 Route::get('authors/create', [AuthorController::class, 'create'])->name('authors.create');
 Route::post('authors', [AuthorController::class, 'store'])->name('authors.store');
 Route::get('/authors', [AuthorController::class, 'index'])->name('authors');
+
+// Author submission page
+Route::get('/author/inquiry', [AuthorInquiryController::class, 'create'])->name('author.inquiry.create');
+Route::post('/author/inquiry', [AuthorInquiryController::class, 'store'])->name('author.inquiry.store');
+
 // Misc Routes
 Route::get('/books/read/{id}', [BookReaderController::class, 'showReader'])->name('books.read');
 
@@ -53,6 +77,7 @@ Route::get('/books/{id}/sample', [BookReaderController::class, 'showSample'])->n
 Route::get('/books/{bookId}/{page}', [BookImageController::class, 'show'])->name('books.page');
 
 Route::get('/bookshelf', [BookController::class, 'bookshelf'])->name('books.bookshelf');
+
 // search kora route 
 Route::get('/books/search', [BookController::class, 'ajaxSearch'])->name('books.ajaxSearch');
 
@@ -62,9 +87,9 @@ Route::get('/about', function () {
 
 Route::get('/books/{id}', [BookController::class, 'show'])->name('books.show');
 
-Route::get('/publish', function () {
-    return view('publish');
-})->name('publish');
+// Author inquiry form
+Route::get('/publish', [AuthorInquiryController::class, 'showForm'])->name('author.inquiry.form');
+Route::post('/publish', [AuthorInquiryController::class, 'submit'])->name('author.inquiry.submit');
 
 // User Authentication Routes 
 Route::get('/login', [UserController::class, 'showLoginForm'])->name('login');

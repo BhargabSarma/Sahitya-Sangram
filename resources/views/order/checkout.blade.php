@@ -27,14 +27,34 @@
             @csrf
 
             <div>
-                <h2 class="text-lg font-semibold text-slate-700 mb-4">Shipping Address</h2>
-                <div class="grid gap-4">
-                    <input type="text" name="address[line1]" class="border rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-400" placeholder="Address Line 1" required>
-                    <input type="text" name="address[city]" class="border rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-400" placeholder="City" required>
-                    <input type="text" name="address[state]" class="border rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-400" placeholder="State" required>
-                    <input type="text" name="address[zip]" class="border rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-400" placeholder="Zip" required>
-                    <input type="text" name="address[country]" class="border rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-400" placeholder="Country" required>
-                </div>
+                <h2 class="text-lg font-semibold text-slate-700 mb-4">Delivery Address</h2>
+                @if($addresses->count())
+                    <div class="space-y-3">
+                        @foreach($addresses as $address)
+                            <label class="flex items-start gap-3 border rounded-lg p-3 cursor-pointer @if($address->is_default) border-indigo-500 @endif">
+                                <input
+                                    type="radio"
+                                    name="address_id"
+                                    value="{{ $address->id }}"
+                                    @if(($defaultAddress && $address->id == $defaultAddress->id) || (!$defaultAddress && $loop->first)) checked @endif
+                                    class="mt-1 accent-indigo-600"
+                                    required
+                                >
+                                <span>
+                                    <span class="font-semibold">{{ $address->name }}</span>
+                                    <span class="badge bg-light text-dark ms-2">{{ $address->type }}</span><br>
+                                    <span class="text-sm text-slate-600">{{ $address->full_name }}</span><br>
+                                    <span class="text-sm text-slate-600">{{ $address->street_address }}, {{ $address->city }}, {{ $address->state }} {{ $address->zip }}<br>{{ $address->country }}<br>Phone: {{ $address->phone }}</span>
+                                    @if($address->is_default)
+                                        <span class="badge bg-primary ms-2">Default</span>
+                                    @endif
+                                </span>
+                            </label>
+                        @endforeach
+                    </div>
+                @else
+                    <div class="text-muted mb-2">No address found. Please <a href="{{ route('profile.show') }}" class="text-indigo-600">add an address</a> in your profile.</div>
+                @endif
             </div>
 
             <div>
