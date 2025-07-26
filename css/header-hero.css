@@ -1,0 +1,129 @@
+/* Base header styles */
+#blur-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background: rgba(255, 255, 255, 0.99);
+  box-shadow: 0 1px 16px 0 rgba(30, 41, 59, 0.10);
+  border-radius: 0;
+  padding: 0.7rem 2vw;
+  z-index: 20;
+  backdrop-filter: blur(0px);
+  -webkit-backdrop-filter: blur(0px);
+  transform: scaleX(1);
+  transition:
+    background 0.4s cubic-bezier(.4, 0, .2, 1),
+    box-shadow 0.4s cubic-bezier(.4, 0, .2, 1),
+    padding 0.4s cubic-bezier(.4, 0, .2, 1),
+    border-radius 0.4s cubic-bezier(.4, 0, .2, 1),
+    backdrop-filter 0.4s cubic-bezier(.4, 0, .2, 1),
+    top 0.4s cubic-bezier(.4, 0, .2, 1),
+    transform 0.4s cubic-bezier(.4, 0, .2, 1);
+}
+
+/* Header when scrolled */
+#blur-header.scrolled {
+  top: 26px !important; /* Adjusted for more compression */
+  background: rgba(255, 255, 255, 0.72);
+  box-shadow: 0 2px 24px 0 rgba(30, 41, 59, 0.15);
+  border-radius: 2rem;
+  padding: 0.5rem 3vw; /* Less compression horizontally */
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  transform: scaleX(0.98); /* Less squeeze */
+}
+
+/* Optional container size change for compression */
+#blur-header .container,
+#header-content {
+  transition: padding 0.3s cubic-bezier(.4, 0, .2, 1), max-width 0.4s;
+  max-width: 100%;
+  margin: 0 auto;
+}
+
+#blur-header.scrolled .container,
+#blur-header.scrolled #header-content {
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+  max-width: 1200px; /* More space for content */
+}
+
+/* Modern nav link style for header */
+#blur-header nav a {
+  text-decoration: none;
+  position: relative;
+  transition: color 0.2s;
+}
+
+/* Modern underline-on-hover effect */
+#blur-header nav a::after {
+  content: '';
+  display: block;
+  position: absolute;
+  left: 0;
+  bottom: -2px;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, #6366f1 0%, #a21caf 100%);
+  border-radius: 2px;
+  transform: scaleX(0);
+  transition: transform 0.3s cubic-bezier(.4, 0, .2, 1);
+}
+
+#blur-header nav a:hover::after,
+#blur-header nav a:focus::after {
+  transform: scaleX(1);
+}
+
+#blur-header nav a:hover,
+#blur-header nav a:focus {
+  color: #6366f1; /* Accent color on hover */
+}
+
+/* Modern search box styles */
+#blur-header .search-box-animated {
+  position: absolute;
+  right: 30px;
+  top: 0;
+  width: 240px;
+  background: #fff;
+  border-radius: 1.5rem;
+  box-shadow: 0 4px 24px 0 rgba(30,41,59,0.13);
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-10px) scale(0.98);
+  transition: opacity 0.35s cubic-bezier(.4,0,.2,1), transform 0.35s cubic-bezier(.4,0,.2,1);
+  z-index: 50;
+  padding: 0.5rem 1rem;
+}
+
+#blur-header .search-box-animated.active {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0) scale(1);
+}
+
+#blur-header .search-input {
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 1rem;
+  flex: 1;
+  padding: 0.5rem 0;
+  color: #181b29;
+}
+
+#blur-header .search-submit {
+  background: none;
+  border: none;
+  color: #6366f1;
+  font-size: 1.2rem;
+  padding: 0 0.5rem;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+#blur-header .search-submit:hover {
+  color: #a21caf;
+}

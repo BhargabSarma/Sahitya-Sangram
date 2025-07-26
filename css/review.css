@@ -1,0 +1,205 @@
+.feedback {
+  --normal: #414052;
+  --normal-shadow: #313140;
+  --normal-shadow-top: #4c4b60;
+  --normal-mouth: #2e2e3d;
+  --normal-eye: #282734;
+  --active: #f8da69;
+  --active-shadow: #f4b555;
+  --active-shadow-top: #fff6d3;
+  --active-mouth: #f05136;
+  --active-eye: #313036;
+  --active-tear: #76b5e7;
+  --active-shadow-angry: #e94f1d;
+  --hover: #454456;
+  --hover-shadow-top: #59586b;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+}
+
+.feedback label {
+  position: relative;
+  transition: transform 0.3s;
+  cursor: pointer;
+}
+
+.feedback label:not(:last-child) {
+  margin-right: 20px;
+}
+
+.feedback label input {
+  appearance: none;
+  outline: none;
+  border: none;
+  display: block;
+  position: absolute;
+  width: 40px;
+  height: 40px;
+  left: 0;
+  top: 0;
+  margin: 0;
+  padding: 0;
+  border-radius: 50%;
+  background: var(--sb, var(--normal));
+  box-shadow: inset 3px -3px 4px var(--sh, var(--normal-shadow)),
+    inset -1px 1px 2px var(--sht, var(--normal-shadow-top));
+  transition: background 0.4s, box-shadow 0.4s, transform 0.3s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.feedback label div {
+  width: 40px;
+  height: 40px;
+  position: relative;
+  transform: perspective(240px) translateZ(4px);
+}
+
+.feedback label div svg,
+.feedback label div:before,
+.feedback label div:after {
+  display: block;
+  position: absolute;
+  left: var(--l, 9px);
+  top: var(--t, 13px);
+  width: var(--w, 8px);
+  height: var(--h, 1px);
+  transform: rotate(var(--r, 0deg)) scale(var(--sc, 1)) translateZ(0);
+}
+
+.feedback label div svg {
+  fill: none;
+  stroke: var(--s);
+  stroke-width: 1.5px;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: stroke 0.4s;
+}
+
+.feedback label div svg.eye {
+  --s: var(--e, var(--normal-eye));
+  --t: 17px;
+  --w: 7px;
+  --h: 4px;
+}
+
+.feedback label div svg.eye.right {
+  --l: 23px;
+}
+
+.feedback label div svg.mouth {
+  --s: var(--m, var(--normal-mouth));
+  --l: 11px;
+  --t: 23px;
+  --w: 18px;
+  --h: 7px;
+}
+
+.feedback label div:before,
+.feedback label div:after {
+  content: "";
+  z-index: var(--zi, 1);
+  border-radius: var(--br, 1px);
+  background: var(--b, var(--e, var(--normal-eye)));
+  transition: background 0.4s;
+}
+
+.feedback label.angry div:before {
+  --r: 20deg;
+}
+.feedback label.angry div:after {
+  --l: 23px;
+  --r: -20deg;
+}
+.feedback label.angry div svg.eye {
+  stroke-dasharray: 4.55;
+  stroke-dashoffset: 8.15;
+}
+.feedback label.sad div:before,
+.feedback label.sad div:after {
+  --b: var(--active-tear);
+  --sc: 0;
+  --w: 5px;
+  --h: 5px;
+  --t: 15px;
+  --br: 50%;
+}
+.feedback label.sad div:after {
+  --l: 25px;
+}
+.feedback label.sad div svg.eye {
+  --t: 16px;
+}
+.feedback label.sad div svg.mouth {
+  --t: 24px;
+  stroke-dasharray: 9.5;
+  stroke-dashoffset: 33.25;
+}
+.feedback label.ok div:before {
+  --l: 12px;
+  --t: 17px;
+  --h: 4px;
+  --w: 4px;
+  --br: 50%;
+  box-shadow: 12px 0 0 var(--e, var(--normal-eye));
+}
+.feedback label.ok div:after {
+  --l: 13px;
+  --t: 26px;
+  --w: 14px;
+  --h: 2px;
+  --br: 1px;
+  --b: var(--m, var(--normal-mouth));
+}
+.feedback label.good div:before {
+  --b: var(--m, var(--normal-mouth));
+  --w: 5px;
+  --h: 5px;
+  --br: 50%;
+  --t: 22px;
+  --zi: 0;
+  opacity: 0.5;
+  box-shadow: 16px 0 0 var(--b);
+  filter: blur(2px);
+}
+.feedback label.good div svg.eye {
+  --t: 15px;
+  --sc: -1;
+  stroke-dasharray: 4.55;
+  stroke-dashoffset: 8.15;
+}
+.feedback label.good div svg.mouth {
+  --t: 22px;
+  --sc: -1;
+  stroke-dasharray: 13.3;
+  stroke-dashoffset: 23.75;
+}
+.feedback label.happy div:before,
+.feedback label.happy div:after {
+  --sc: 0;
+}
+.feedback label.happy div:after {
+  --b: var(--m, var(--normal-mouth));
+  --l: 11px;
+  --t: 23px;
+  --w: 18px;
+  --h: 8px;
+  --br: 0 0 8px 8px;
+}
+.feedback label.happy div svg.eye {
+  --t: 14px;
+  --sc: -1;
+}
+.feedback label input:checked {
+  --sb: var(--active);
+  --sh: var(--active-shadow);
+  --sht: var(--active-shadow-top);
+}
+.feedback label input:checked + div {
+  --m: var(--active-mouth);
+  --e: var(--active-eye);
+}
+.feedback label:hover {
+  transform: scale(1.08);
+}

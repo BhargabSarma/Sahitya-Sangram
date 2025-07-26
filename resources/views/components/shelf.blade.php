@@ -41,3 +41,5 @@
         </a>
     </div>
 </div>
+<!-- Spacer between shelf and plans for mobile and desktop -->
+<div class="mobile-gap"></div>
