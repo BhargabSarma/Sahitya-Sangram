@@ -5,10 +5,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'Admin Panel')</title>
-    
+
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    
+
     <!-- Font Awesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
@@ -26,9 +26,10 @@
 
         body {
             background-color: var(--main-content-bg);
-            font-family: 'Inter', sans-serif; /* A modern, clean font */
+            font-family: 'Inter', sans-serif;
+            /* A modern, clean font */
         }
-        
+
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
         .wrapper {
@@ -89,7 +90,7 @@
             color: #fff;
             background: var(--sidebar-link-active-bg);
         }
-        
+
         #sidebar ul li a i {
             margin-right: 15px;
             width: 20px;
@@ -99,11 +100,12 @@
         /* Main Content Styles */
         #content {
             width: 100%;
-            padding-left: 260px; /* Same as sidebar width */
+            padding-left: 260px;
+            /* Same as sidebar width */
             min-height: 100vh;
             transition: all 0.3s;
         }
-        
+
         /* Top Navbar in Content Area */
         .top-navbar {
             padding: 15px 30px;
@@ -113,7 +115,7 @@
             justify-content: space-between;
             align-items: center;
         }
-        
+
         .main-content-area {
             padding: 2rem;
         }
@@ -121,11 +123,14 @@
         /* Responsive Styles */
         @media (max-width: 992px) {
             #sidebar {
-                margin-left: -260px; /* Hide sidebar by default on smaller screens */
+                margin-left: -260px;
+                /* Hide sidebar by default on smaller screens */
             }
+
             #sidebar.active {
                 margin-left: 0;
             }
+
             #content {
                 padding-left: 0;
                 width: 100%;
@@ -153,8 +158,11 @@
                 <li class="{{ Request::is('authors*') ? 'active' : '' }}">
                     <a href="{{ route('authors') }}"><i class="fas fa-user-edit"></i>Authors</a>
                 </li>
-                <li class="{{ Request::is('about*') ? 'active' : '' }}">
-                    <a href="{{ route('about') }}"><i class="fas fa-info-circle"></i>About Us</a>
+                <li class="{{ Request::is('admin/author-inquiries*') ? 'active' : '' }}">
+                    <a href="{{ route('admin.author.inquiries') }}"><i class="fas fa-envelope"></i>Author Inquiries</a>
+                </li>
+                <li class="{{ Request::is('admin/payments*') ? 'active' : '' }}">
+                    <a href="{{ route('admin.payments') }}"><i class="fas fa-money-check-alt"></i>Payments & Orders</a>
                 </li>
             </ul>
         </nav>

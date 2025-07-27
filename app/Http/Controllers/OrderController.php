@@ -7,7 +7,7 @@ use App\Models\OrderItem;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Cart;
-
+use App\Models\Address;
 
 class OrderController extends Controller
 {
@@ -17,17 +17,18 @@ class OrderController extends Controller
         if (!$cart || $cart->items->isEmpty()) {
             return redirect()->route('cart.index')->with('error', 'Your cart is empty!');
         }
-        return view('order.checkout', compact('cart'));
+
+        // Fetch addresses for this user
+        $addresses = Address::where('user_id', Auth::id())->get();
+        $defaultAddress = $addresses->where('is_default', true)->first();
+
+        return view('order.checkout', compact('cart', 'addresses', 'defaultAddress'));
     }
 
     public function placeOrder(Request $request)
     {
         $request->validate([
-            'address.line1' => 'required|string|max:255',
-            'address.city' => 'required|string|max:100',
-            'address.state' => 'required|string|max:100',
-            'address.zip' => 'required|string|max:20',
-            'address.country' => 'required|string|max:100',
+            'address_id' => 'required|exists:addresses,id',
         ]);
 
         $cart = Cart::where('user_id', Auth::id())->with('items.book')->first();
@@ -39,11 +40,27 @@ class OrderController extends Controller
             return $carry + ($item->book->digital_price * $item->quantity);
         }, 0);
 
+        // Fetch the full address
+        $address = Address::findOrFail($request->address_id);
+
+        // Convert address to JSON
+        $shippingAddress = json_encode([
+            'name' => $address->name ?? '',
+            'phone' => $address->phone ?? '',
+            'street' => $address->street ?? '',
+            'city' => $address->city ?? '',
+            'state' => $address->state ?? '',
+            'postal_code' => $address->postal_code ?? '',
+            'country' => $address->country ?? '',
+        ]);
+
+        // Save address_id and shipping_address to order
         $order = Order::create([
             'user_id' => Auth::id(),
+            'address_id' => $request->address_id,
+            'shipping_address' => $shippingAddress,
             'total' => $total,
             'status' => 'pending',
-            'shipping_address' => $request->input('address'),
         ]);
 
         foreach ($cart->items as $item) {
@@ -57,11 +74,9 @@ class OrderController extends Controller
 
         $cart->items()->delete();
 
-        // Redirect to payment page instead of confirmation
         return redirect()->route('payments.show', $order->id)
             ->with('success', 'Order placed! Please complete your payment.');
     }
-
     public function confirmation($orderId)
     {
         $order = Order::with('items.book')->findOrFail($orderId);
