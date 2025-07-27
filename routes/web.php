@@ -117,14 +117,16 @@ Route::post('/cart/remove/{book}', [CartController::class, 'remove'])->name('car
 Route::post('/cart/clear', [CartController::class, 'clear'])->name('cart.clear');
 
 Route::middleware(['auth'])->group(function () {
-    Route::get('/profile/addresses', [ProfileController::class, 'index'])->name('profile.addresses.index');
+    Route::get('/profile/addresses', [ProfileController::class, 'show'])->name('profile.addresses.show');
     Route::get('/profile/addresses/create', [ProfileController::class, 'create'])->name('profile.addresses.create');
     Route::post('/profile/addresses', [ProfileController::class, 'store'])->name('profile.addresses.store');
     Route::post('/profile/addresses/{address}/set-default', [ProfileController::class, 'setDefault'])->name('profile.addresses.set-default');
     Route::get('/profile/addresses/{address}/edit', [ProfileController::class, 'edit'])->name('profile.addresses.edit');
     Route::put('/profile/addresses/{address}', [ProfileController::class, 'update'])->name('profile.addresses.update');
     Route::delete('/profile/addresses/{address}', [ProfileController::class, 'destroy'])->name('profile.addresses.destroy');
+
     Route::get('/profile', [ProfileController::class, 'show'])->name('profile.show');
+    Route::put('/profile/update', [ProfileController::class, 'update'])->name('profile.update');
     // Order routes
     Route::get('/checkout', [OrderController::class, 'checkout'])->name('order.checkout');
     Route::post('/checkout', [OrderController::class, 'checkout'])->name('order.checkout.post');

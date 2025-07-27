@@ -23,14 +23,14 @@ class ProfileController extends Controller
     }
 
 
-    public function index(Request $request)
-    {
-        $user = Auth::user();
-        $addresses = $user->addresses;
-        $defaultAddress = $user->defaultAddress;
+    // public function index(Request $request)
+    // {
+    //     $user = Auth::user();
+    //     $addresses = $user->addresses;
+    //     $defaultAddress = $user->defaultAddress;
 
-        return view('profile.show', compact('addresses', 'defaultAddress'));
-    }
+    //     return view('profile.show', compact('user', 'addresses', 'defaultAddress'));
+    // }
 
     public function create()
     {
@@ -73,7 +73,7 @@ class ProfileController extends Controller
             'is_default'     => $isDefault,
         ]);
 
-        return redirect()->route('profile.addresses.index')->with('success', 'Address added!');
+        return redirect()->route('profile.addresses.show')->with('success', 'Address added!');
     }
 
     public function setDefault(Request $request, Address $address)
@@ -108,5 +108,22 @@ class ProfileController extends Controller
         }
         $address->delete();
         return back()->with('success', 'Address deleted!');
+    }
+    // profile update of user. connected to users table
+    public function update(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'gender' => 'nullable|string|max:20',
+            'phone' => 'nullable|string|max:20',
+        ]);
+
+        $user = $request->user();
+        $user->name = $request->name;
+        $user->gender = $request->gender;
+        $user->phone = $request->phone;
+        $user->save();
+
+        return redirect()->route('profile.show')->with('success', 'Profile updated successfully!');
     }
 }

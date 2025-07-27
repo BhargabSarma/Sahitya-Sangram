@@ -13,5 +13,19 @@
         </ul>
         <p><strong>Total:</strong> ₹{{ number_format($order->total, 2) }}</p>
         <p><strong>Status:</strong> {{ ucfirst($order->status) }}</p>
+        @php
+            $shippingAddress = json_decode($order->shipping_address, true);
+        @endphp
+        <div class="mt-4">
+            <h5>Shipping Address:</h5>
+            <p>
+                {{ $shippingAddress['name'] ?? '' }}<br>
+                {{ $shippingAddress['phone'] ?? '' }}<br>
+                {{ $shippingAddress['street'] ?? '' }}<br>
+                {{ $shippingAddress['city'] ?? '' }}, {{ $shippingAddress['state'] ?? '' }}<br>
+                {{ $shippingAddress['postal_code'] ?? '' }}<br>
+                {{ $shippingAddress['country'] ?? '' }}
+            </p>
+        </div>
     </div>
 @endsection

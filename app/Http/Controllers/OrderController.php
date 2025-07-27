@@ -40,10 +40,25 @@ class OrderController extends Controller
             return $carry + ($item->book->digital_price * $item->quantity);
         }, 0);
 
-        // Save address_id to order
+        // Fetch the full address
+        $address = Address::findOrFail($request->address_id);
+
+        // Convert address to JSON
+        $shippingAddress = json_encode([
+            'name' => $address->name ?? '',
+            'phone' => $address->phone ?? '',
+            'street' => $address->street ?? '',
+            'city' => $address->city ?? '',
+            'state' => $address->state ?? '',
+            'postal_code' => $address->postal_code ?? '',
+            'country' => $address->country ?? '',
+        ]);
+
+        // Save address_id and shipping_address to order
         $order = Order::create([
             'user_id' => Auth::id(),
             'address_id' => $request->address_id,
+            'shipping_address' => $shippingAddress,
             'total' => $total,
             'status' => 'pending',
         ]);

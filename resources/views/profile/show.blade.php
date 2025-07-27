@@ -222,7 +222,11 @@
                     <div class="modal-body">
                         <form id="addressForm" method="POST" action="{{ route('profile.addresses.store') }}">
                             @csrf
-
+                            <div class="mb-2">
+                                <label class="form-label" for="name">Name</label>
+                                <input type="text" class="form-control" id="name" name="name"
+                                    placeholder="Apartment name" required>
+                            </div>
                             <div class="mb-2">
                                 <label class="form-label" for="full_name">Full Name</label>
                                 <input type="text" class="form-control" id="full_name" name="full_name"
@@ -281,7 +285,9 @@
         </div>
 
         <!-- Profile Form -->
-        <form class="profile-form mt-3" autocomplete="off">
+        <form class="profile-form mt-3" autocomplete="off" method="POST" action="{{ route('profile.update') }}">
+            @csrf
+            @method('PUT')
             <!-- Name -->
             <div class="form-group mb-3">
                 <label class="form-label" for="name"><i class="fa fa-user"></i> Name</label>
