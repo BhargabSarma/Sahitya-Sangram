@@ -18,9 +18,10 @@ class CreateCartsTable extends Migration
             $table->id();
             $table->foreignId('cart_id')->constrained('carts');
             $table->foreignId('book_id')->constrained('books');
+            $table->string('type')->default('hard_copy'); // <-- Add this line for type
             $table->integer('quantity')->default(1);
             $table->timestamps();
-            $table->unique(['cart_id', 'book_id']);
+            $table->unique(['cart_id', 'book_id', 'type']); // <-- Update unique index
         });
     }
 

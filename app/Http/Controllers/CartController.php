@@ -25,12 +25,16 @@ class CartController extends Controller
             ];
         } else {
             $sessionCart = session()->get('cart', []);
-            $items = collect($sessionCart)->map(function ($item, $bookId) {
+            $items = collect($sessionCart)->map(function ($item, $key) {
+                // $key format: bookId-type
+                [$bookId, $type] = explode('-', $key);
                 $book = Book::find($bookId);
                 return (object)[
                     'book' => $book,
                     'quantity' => $item['quantity'],
                     'book_id' => $bookId,
+                    'type' => $type,
+                    'price' => $item['price'] ?? 0,
                 ];
             });
             return [
@@ -49,16 +53,16 @@ class CartController extends Controller
 
     public function add(Request $request, $bookId)
     {
+        $type = $request->input('type', 'hard_copy');
+        $price = $request->input('price', 0);
+
         if (Auth::check()) {
             $cart = Cart::firstOrCreate(['user_id' => Auth::id()]);
-            $item = $cart->items()->where('book_id', $bookId)->first();
-            $type = $request->input('type', 'hard_copy');
-            $price = $request->input('price', 0);
+            // Find item by both book_id and type
+            $item = $cart->items()->where('book_id', $bookId)->where('type', $type)->first();
 
             if ($item) {
                 $item->quantity += 1;
-                // Ensure type and price are always set
-                $item->type = $type;
                 $item->price = $price;
                 $item->save();
             } else {
@@ -72,13 +76,16 @@ class CartController extends Controller
             $cart_count = $cart->items()->sum('quantity');
         } else {
             $cart = session()->get('cart', []);
-            if (isset($cart[$bookId])) {
-                $cart[$bookId]['quantity'] += 1;
+            // Use a composite key: bookId-type
+            $cartKey = $bookId . '-' . $type;
+            if (isset($cart[$cartKey])) {
+                $cart[$cartKey]['quantity'] += 1;
             } else {
-                $cart[$bookId] = [
+                $cart[$cartKey] = [
+                    'book_id' => $bookId,
                     'quantity' => 1,
-                    'type' => $request->input('type', 'hard_copy'),
-                    'price' => $request->input('price', 0),
+                    'type' => $type,
+                    'price' => $price,
                 ];
             }
             session()->put('cart', $cart);
@@ -94,10 +101,11 @@ class CartController extends Controller
 
     public function update(Request $request, $bookId)
     {
+        $type = $request->input('type', 'hard_copy');
         $quantity = max(1, (int)$request->input('quantity', 1));
         if (Auth::check()) {
             $cart = Cart::firstOrCreate(['user_id' => Auth::id()]);
-            $item = $cart->items()->where('book_id', $bookId)->first();
+            $item = $cart->items()->where('book_id', $bookId)->where('type', $type)->first();
             if ($item) {
                 $item->quantity = $quantity;
                 $item->save();
@@ -105,8 +113,9 @@ class CartController extends Controller
             $cart_count = $cart->items()->sum('quantity');
         } else {
             $cart = session()->get('cart', []);
-            if (isset($cart[$bookId])) {
-                $cart[$bookId]['quantity'] = $quantity;
+            $cartKey = $bookId . '-' . $type;
+            if (isset($cart[$cartKey])) {
+                $cart[$cartKey]['quantity'] = $quantity;
             }
             session()->put('cart', $cart);
             $cart_count = collect($cart)->sum('quantity');
@@ -121,13 +130,15 @@ class CartController extends Controller
 
     public function remove(Request $request, $bookId)
     {
+        $type = $request->input('type', 'hard_copy');
         if (Auth::check()) {
             $cart = Cart::firstOrCreate(['user_id' => Auth::id()]);
-            $cart->items()->where('book_id', $bookId)->delete();
+            $cart->items()->where('book_id', $bookId)->where('type', $type)->delete();
             $cart_count = $cart->items()->sum('quantity');
         } else {
             $cart = session()->get('cart', []);
-            unset($cart[$bookId]);
+            $cartKey = $bookId . '-' . $type;
+            unset($cart[$cartKey]);
             session()->put('cart', $cart);
             $cart_count = collect($cart)->sum('quantity');
         }

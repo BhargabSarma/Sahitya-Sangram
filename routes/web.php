@@ -88,10 +88,12 @@ Route::get('/about', function () {
 Route::get('/books/{id}', [BookController::class, 'show'])->name('books.show');
 
 // Author inquiry form
+
 Route::get('/publish', [AuthorInquiryController::class, 'showForm'])->name('author.inquiry.form');
 Route::post('/publish', [AuthorInquiryController::class, 'submit'])->name('author.inquiry.submit');
 
 // User Authentication Routes 
+
 Route::get('/login', [UserController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [UserController::class, 'login']);
 Route::get('/register', [UserController::class, 'showRegisterForm'])->name('register');
@@ -101,10 +103,12 @@ Route::post('/logout', [UserController::class, 'logout'])->name('logout');
 
 
 // Google
+
 Route::get('auth/google', [SocialAuthController::class, 'redirectToGoogle']);
 Route::get('auth/google/callback', [SocialAuthController::class, 'handleGoogleCallback']);
 
 // Facebook
+
 Route::get('auth/facebook', [SocialAuthController::class, 'redirectToFacebook']);
 Route::get('auth/facebook/callback', [SocialAuthController::class, 'handleFacebookCallback']);
 
@@ -127,7 +131,9 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('/profile', [ProfileController::class, 'show'])->name('profile.show');
     Route::put('/profile/update', [ProfileController::class, 'update'])->name('profile.update');
+
     // Order routes
+
     Route::get('/checkout', [OrderController::class, 'checkout'])->name('order.checkout');
     Route::post('/checkout', [OrderController::class, 'checkout'])->name('order.checkout.post');
     Route::post('/order/place', [OrderController::class, 'placeOrder'])->name('order.place');

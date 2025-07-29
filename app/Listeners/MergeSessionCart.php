@@ -32,13 +32,15 @@ class MergeSessionCart
         $user = $event->user;
         $cart = Cart::firstOrCreate(['user_id' => $user->id]);
 
-        foreach ($sessionCart as $bookId => $item) {
-            $cartItem = $cart->items()->where('book_id', $bookId)->first();
-            $type = $item['type'] ?? 'hard_copy';
+        foreach ($sessionCart as $cartKey => $item) {
+            // $cartKey format: bookId-type
+            [$bookId, $type] = explode('-', $cartKey);
             $price = $item['price'] ?? 0;
+
+            $cartItem = $cart->items()->where('book_id', $bookId)->where('type', $type)->first();
+
             if ($cartItem) {
                 $cartItem->quantity += $item['quantity'];
-                $cartItem->type = $type;
                 $cartItem->price = $price;
                 $cartItem->save();
             } else {
