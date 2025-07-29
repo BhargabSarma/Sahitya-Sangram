@@ -4,11 +4,14 @@
     <meta charset="UTF-8">
     <title>Checkout</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- TailwindCSS for modern utility classes -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="{{ asset('css/header-hero.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/footer.css') }}">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:400,600,700,800&display=swap">
+    <link rel="stylesheet" href="https://unpkg.com/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/bs-brain@2.0.4/components/logins/login-12/assets/css/login-12.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         body {
@@ -20,7 +23,7 @@
 <body>
 @include('components.header')
 
-<main class="container mx-auto max-w-2xl px-4 py-12">
+<main class="container mx-auto max-w-2xl px-4 py-24">
     <div class="bg-white rounded-xl shadow-lg p-6 md:p-8">
         <h1 class="font-bold text-2xl md:text-3xl text-slate-800 mb-8">Checkout</h1>
         <form action="{{ route('order.place') }}" method="POST" class="space-y-8">
@@ -64,12 +67,15 @@
                     @foreach($cart->items as $item)
                         @php
                             $book = $item->book;
-                            $itemTotal = $book->digital_price * $item->quantity;
+                            $type = $item->type ?? 'digital_copy';
+                            $price = $item->price ?? 0; // Use the price from the cart item
+                            $itemTotal = $price * $item->quantity;
                             $grandTotal += $itemTotal;
                         @endphp
                         <li class="flex justify-between py-2">
                             <span class="text-slate-700">
                                 {{ $book->title ?? 'Unknown Book' }}
+                                <span class="text-indigo-500 ms-2">[{{ ucfirst(str_replace('_', ' ', $type)) }}]</span>
                                 <span class="text-slate-400">(x{{ $item->quantity }})</span>
                             </span>
                             <span class="font-semibold text-slate-800">₹{{ number_format($itemTotal, 2) }}</span>
@@ -88,7 +94,12 @@
         </form>
     </div>
 </main>
-
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/CustomEase.min.js"></script>
+    <script src="{{ asset('js/index.js') }}"></script>
+    <script src="{{ asset('js/hero-gsap.js') }}"></script>
+    
 @include('components.footer')
 </body>
 </html>

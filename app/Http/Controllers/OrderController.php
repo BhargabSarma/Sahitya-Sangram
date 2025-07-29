@@ -67,8 +67,9 @@ class OrderController extends Controller
             OrderItem::create([
                 'order_id' => $order->id,
                 'book_id' => $item->book_id,
+                'type' => $item->type, // <-- Add this line
                 'quantity' => $item->quantity,
-                'price' => $item->book->digital_price,
+                'price' => $item->price,
             ]);
         }
 
