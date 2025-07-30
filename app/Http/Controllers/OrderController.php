@@ -37,7 +37,11 @@ class OrderController extends Controller
         }
 
         $total = $cart->items->reduce(function ($carry, $item) {
-            return $carry + ($item->book->digital_price * $item->quantity);
+            if ($item->type === 'hard_copy') {
+                return $carry + ($item->book->hard_copy_price * $item->quantity);
+            } else {
+                return $carry + ($item->book->digital_price * $item->quantity);
+            }
         }, 0);
 
         $address = Address::findOrFail($request->address_id);

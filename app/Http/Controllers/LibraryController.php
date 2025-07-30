@@ -20,6 +20,12 @@ class LibraryController extends Controller
             ->where('status', 'completed')
             ->pluck('id');
 
+        $digitalBookIds = OrderItem::whereIn('order_id', $completedOrderIds)
+            ->where('type', 'digital_copy')
+            ->pluck('book_id')
+            ->unique()
+            ->toArray();
+
         $bookIds = OrderItem::whereIn('order_id', $completedOrderIds)
             ->pluck('book_id')
             ->unique();
@@ -32,7 +38,7 @@ class LibraryController extends Controller
             ->get()
             ->keyBy('book_id');
 
-        return view('library.index', compact('books', 'reviews'));
+        return view('library.index', compact('books', 'reviews', 'digitalBookIds'));
     }
 
     // Show review form for a book
