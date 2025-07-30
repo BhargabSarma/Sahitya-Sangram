@@ -109,6 +109,16 @@
                             </div>
                         </div>
                         <!-- Quantity Controls -->
+                        @php
+                            $inventory = null;
+                            if ($type === 'hard_copy') {
+                                $inventory = \App\Models\Inventory::where('book_id', $item->book_id)->first();
+                                $maxQty = $inventory ? $inventory->stock : 0;
+                            } else {
+                                $maxQty = null; // Unlimited for digital copy
+                            }
+                        @endphp
+
                         <div class="w-full md:w-1/5 flex justify-center items-center mb-4 md:mb-0">
                             <form action="{{ route('cart.update', ['book' => $item->book_id]) }}" method="POST"
                                 class="flex items-center">
@@ -123,9 +133,15 @@
                                 @csrf
                                 <input type="hidden" name="type" value="{{ $type }}">
                                 <input type="hidden" name="quantity" value="{{ $qty + 1 }}">
-                                <button type="submit" class="font-bold text-xl text-slate-500 hover:text-slate-700">+</button>
+                                <button type="submit" class="font-bold text-xl text-slate-500 hover:text-slate-700"
+                                    @if($type === 'hard_copy' && $inventory && $qty >= $inventory->stock) disabled
+                                    @endif>+</button>
                             </form>
                         </div>
+
+                        @if($type === 'hard_copy' && $inventory && $qty >= $inventory->stock)
+                            <span class="text-red-600 text-sm font-semibold ml-2">Only {{ $inventory->stock }} left in stock</span>
+                        @endif
                         <!-- Price -->
                         <div class="w-full md:w-1/5 text-center font-semibold text-base mb-4 md:mb-0">
                             ₹{{ number_format($price, 2) }}

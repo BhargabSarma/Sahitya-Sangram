@@ -122,8 +122,15 @@ class CartController extends Controller
 
     public function update(Request $request, $bookId)
     {
-        $type = $request->input('type', 'hard_copy');
         $quantity = max(1, (int)$request->input('quantity', 1));
+        $type = $request->input('type', 'hard_copy');
+
+        if ($type === 'hard_copy') {
+            $inventory = Inventory::where('book_id', $bookId)->first();
+            if ($inventory && $quantity > $inventory->stock) {
+                return back()->withErrors(['message' => "Cannot order more than {$inventory->stock} for this book."]);
+            }
+        }
         if (Auth::check()) {
             $cart = Cart::firstOrCreate(['user_id' => Auth::id()]);
             $item = $cart->items()->where('book_id', $bookId)->where('type', $type)->first();

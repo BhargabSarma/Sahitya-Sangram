@@ -298,6 +298,12 @@
                                 Read Now
                             </a>
                             <div class="space-y-3">
+
+                                @php
+                                    $inventory = \App\Models\Inventory::where('book_id', $book->id)->first();
+                                    $hardCopyStock = $inventory ? $inventory->stock : 0;
+                                @endphp
+
                                 <div id="price-selector" class="grid grid-cols-2 gap-2">
                                     <button data-price-type="hard_copy"
                                         class="price-btn w-full py-2 rounded-md font-semibold bg-indigo-100 text-indigo-700 ring-2 ring-indigo-600">Hard
@@ -305,24 +311,15 @@
                                     <button data-price-type="digital_copy"
                                         class="price-btn w-full py-2 rounded-md font-semibold bg-white text-slate-600 ring-1 ring-slate-300">Digital</button>
                                 </div>
-                                @php
-                                    $inventory = \App\Models\Inventory::where('book_id', $book->id)->first();
-                                @endphp
 
-                                @if($inventory && $inventory->stock > 0)
-                                    <button id="add-to-cart-btn"
-                                        class="w-full text-center px-6 py-3 rounded-lg bg-slate-800 text-white font-semibold text-base shadow-sm hover:bg-slate-700 transition-colors duration-200"
-                                        data-book-id="{{ $book->id }}">
-                                        Add to Cart <span id="price-display"
-                                            class="ml-2 font-bold">₹{{ $book->hard_copy_price }}</span>
-                                    </button>
-                                @else
-                                    <button id="add-to-cart-btn"
-                                        class="w-full text-center px-6 py-3 rounded-lg bg-slate-500 text-white font-semibold text-base shadow-sm opacity-60 cursor-not-allowed"
-                                        disabled>
-                                        Hard Copy Unavailable
-                                    </button>
-                                @endif
+                                <button id="add-to-cart-btn"
+                                    class="w-full text-center px-6 py-3 rounded-lg font-semibold text-base shadow-sm transition-colors duration-200 bg-slate-800 text-white hover:bg-slate-700"
+                                    data-book-id="{{ $book->id }}" data-hard-copy-stock="{{ $hardCopyStock }}">
+                                    Add to Cart
+                                    <span id="price-display" class="ml-2 font-bold">₹{{ $book->hard_copy_price }}</span>
+                                </button>
+                                <span id="stock-warning" class="text-red-600 text-sm font-semibold mt-2"
+                                    style="display:none;">Hard Copy Unavailable</span>
                             </div>
                         </div>
                     </div>
@@ -521,15 +518,41 @@
             const priceSelector = document.getElementById('price-selector');
             const priceDisplay = document.getElementById('price-display');
             const addCartBtn = document.getElementById('add-to-cart-btn');
+            const stockWarning = document.getElementById('stock-warning');
             const bookEditions = {
                 hard_copy: { name: 'Hard Copy', price: '{{ $book->hard_copy_price }}', type: 'hard_copy' },
                 digital_copy: { name: 'Digital', price: '{{ $book->digital_price  }}', type: 'digital_copy' }
             };
             let selectedType = 'hard_copy';
+
+            // Get stock from data attribute for hard copy
+            const hardCopyStock = parseInt(addCartBtn.getAttribute('data-hard-copy-stock'), 10);
+
+            function updateCartButtonState() {
+                if (selectedType === 'hard_copy') {
+                    priceDisplay.textContent = '₹' + bookEditions.hard_copy.price;
+                    if (hardCopyStock < 1) {
+                        addCartBtn.disabled = true;
+                        addCartBtn.classList.add('bg-slate-500', 'opacity-60', 'cursor-not-allowed');
+                        stockWarning.style.display = '';
+                    } else {
+                        addCartBtn.disabled = false;
+                        addCartBtn.classList.remove('bg-slate-500', 'opacity-60', 'cursor-not-allowed');
+                        stockWarning.style.display = 'none';
+                    }
+                } else {
+                    priceDisplay.textContent = '₹' + bookEditions.digital_copy.price;
+                    addCartBtn.disabled = false;
+                    addCartBtn.classList.remove('bg-slate-500', 'opacity-60', 'cursor-not-allowed');
+                    stockWarning.style.display = 'none';
+                }
+            }
+
             if (priceSelector) {
                 priceSelector.addEventListener('click', function (e) {
                     const button = e.target.closest('.price-btn');
                     if (!button || button.dataset.priceType === selectedType) return;
+
                     selectedType = button.dataset.priceType;
                     priceSelector.querySelectorAll('.price-btn').forEach(btn => {
                         btn.classList.remove('bg-indigo-100', 'text-indigo-700', 'ring-2', 'ring-indigo-600');
@@ -537,11 +560,12 @@
                     });
                     button.classList.add('bg-indigo-100', 'text-indigo-700', 'ring-2', 'ring-indigo-600');
                     button.classList.remove('bg-white', 'text-slate-600', 'ring-1', 'ring-slate-300');
-                    if (priceDisplay && bookEditions[selectedType]) {
-                        priceDisplay.textContent = '₹' + bookEditions[selectedType].price;
-                    }
+
+                    updateCartButtonState();
                 });
             }
+            // Initial state
+            updateCartButtonState();
             if (addCartBtn) {
                 addCartBtn.addEventListener('click', function () {
                     const bookId = this.getAttribute('data-book-id');
