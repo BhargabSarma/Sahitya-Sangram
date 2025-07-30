@@ -40,10 +40,8 @@ class OrderController extends Controller
             return $carry + ($item->book->digital_price * $item->quantity);
         }, 0);
 
-        // Fetch the full address
         $address = Address::findOrFail($request->address_id);
 
-        // Convert address to JSON
         $shippingAddress = json_encode([
             'name' => $address->name ?? '',
             'phone' => $address->phone ?? '',
@@ -54,7 +52,6 @@ class OrderController extends Controller
             'country' => $address->country ?? '',
         ]);
 
-        // Save address_id and shipping_address to order
         $order = Order::create([
             'user_id' => Auth::id(),
             'address_id' => $request->address_id,
@@ -67,10 +64,23 @@ class OrderController extends Controller
             OrderItem::create([
                 'order_id' => $order->id,
                 'book_id' => $item->book_id,
-                'type' => $item->type, // <-- Add this line
+                'type' => $item->type,
                 'quantity' => $item->quantity,
                 'price' => $item->price,
             ]);
+
+            // Deplete inventory for hard_copy
+            if ($item->type === 'hard_copy') {
+                $inventory = \App\Models\Inventory::where('book_id', $item->book_id)->first();
+                if ($inventory) {
+                    if ($inventory->stock < $item->quantity) {
+                        return redirect()->route('cart.index')
+                            ->with('error', "Not enough stock for {$item->book->title}!");
+                    }
+                    $inventory->stock -= $item->quantity;
+                    $inventory->save();
+                }
+            }
         }
 
         $cart->items()->delete();

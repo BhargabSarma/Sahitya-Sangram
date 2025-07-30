@@ -305,12 +305,24 @@
                                     <button data-price-type="digital_copy"
                                         class="price-btn w-full py-2 rounded-md font-semibold bg-white text-slate-600 ring-1 ring-slate-300">Digital</button>
                                 </div>
-                                <button id="add-to-cart-btn"
-                                    class="w-full text-center px-6 py-3 rounded-lg bg-slate-800 text-white font-semibold text-base shadow-sm hover:bg-slate-700 transition-colors duration-200"
-                                    data-book-id="{{ $book->id }}">
-                                    Add to Cart <span id="price-display"
-                                        class="ml-2 font-bold">₹{{ $book->hard_copy_price}}</span>
-                                </button>
+                                @php
+                                    $inventory = \App\Models\Inventory::where('book_id', $book->id)->first();
+                                @endphp
+
+                                @if($inventory && $inventory->stock > 0)
+                                    <button id="add-to-cart-btn"
+                                        class="w-full text-center px-6 py-3 rounded-lg bg-slate-800 text-white font-semibold text-base shadow-sm hover:bg-slate-700 transition-colors duration-200"
+                                        data-book-id="{{ $book->id }}">
+                                        Add to Cart <span id="price-display"
+                                            class="ml-2 font-bold">₹{{ $book->hard_copy_price }}</span>
+                                    </button>
+                                @else
+                                    <button id="add-to-cart-btn"
+                                        class="w-full text-center px-6 py-3 rounded-lg bg-slate-500 text-white font-semibold text-base shadow-sm opacity-60 cursor-not-allowed"
+                                        disabled>
+                                        Hard Copy Unavailable
+                                    </button>
+                                @endif
                             </div>
                         </div>
                     </div>

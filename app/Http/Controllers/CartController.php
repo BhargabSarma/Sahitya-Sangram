@@ -7,6 +7,9 @@ use App\Models\Cart;
 use App\Models\CartItem;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Models\Inventory;
+use App\Models\User;
+use Illuminate\Support\Facades\Mail;
 
 class CartController extends Controller
 {
@@ -53,8 +56,26 @@ class CartController extends Controller
 
     public function add(Request $request, $bookId)
     {
-        $type = $request->input('type', 'hard_copy');
         $price = $request->input('price', 0);
+        $type = $request->input('type', 'hard_copy');
+
+        // Only check for hard_copy
+        if ($type === 'hard_copy') {
+            $inventory = Inventory::where('book_id', $bookId)->first();
+            if (!$inventory || $inventory->stock < 1) {
+                return response()->json(['error' => 'Hard copy unavailable.'], 400);
+            }
+
+            // Notify admin if stock is low
+            if ($inventory->stock <= 3) {
+                $adminEmails = User::where('role', 'admin')->pluck('email')->toArray();
+                foreach ($adminEmails as $email) {
+                    Mail::raw("Stock for book ID {$bookId} is low: {$inventory->stock} left.", function ($message) use ($email) {
+                        $message->to($email)->subject('Low Book Stock Alert');
+                    });
+                }
+            }
+        }
 
         if (Auth::check()) {
             $cart = Cart::firstOrCreate(['user_id' => Auth::id()]);

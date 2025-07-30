@@ -27,7 +27,6 @@
         body {
             background-color: var(--main-content-bg);
             font-family: 'Inter', sans-serif;
-            /* A modern, clean font */
         }
 
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
@@ -101,7 +100,6 @@
         #content {
             width: 100%;
             padding-left: 260px;
-            /* Same as sidebar width */
             min-height: 100vh;
             transition: all 0.3s;
         }
@@ -124,7 +122,6 @@
         @media (max-width: 992px) {
             #sidebar {
                 margin-left: -260px;
-                /* Hide sidebar by default on smaller screens */
             }
 
             #sidebar.active {
@@ -148,7 +145,6 @@
             </div>
 
             <ul class="list-unstyled components">
-                {{-- Use Request::is() to set the active class on the correct link --}}
                 <li class="{{ Request::is('admin/dashboard*') ? 'active' : '' }}">
                     <a href="{{ route('admin.dashboard') }}"><i class="fas fa-tachometer-alt"></i>Dashboard</a>
                 </li>
@@ -157,6 +153,9 @@
                 </li>
                 <li class="{{ Request::is('authors*') ? 'active' : '' }}">
                     <a href="{{ route('authors') }}"><i class="fas fa-user-edit"></i>Authors</a>
+                </li>
+                <li class="{{ Request::is('admin/inventory*') ? 'active' : '' }}">
+                    <a href="{{ route('admin.inventory.index') }}"><i class="fas fa-warehouse"></i>Inventory</a>
                 </li>
                 <li class="{{ Request::is('admin/author-inquiries*') ? 'active' : '' }}">
                     <a href="{{ route('admin.author.inquiries') }}"><i class="fas fa-envelope"></i>Author Inquiries</a>
@@ -170,12 +169,9 @@
         <!-- Page Content -->
         <div id="content">
             <nav class="navbar navbar-expand-lg navbar-light top-navbar">
-                {{-- Sidebar Toggle Button (visible on mobile) --}}
                 <button type="button" id="sidebarCollapse" class="btn btn-dark d-lg-none">
                     <i class="fas fa-align-left"></i>
                 </button>
-
-                {{-- Spacer to push logout to the right --}}
                 <div class="ms-auto">
                     @auth
                         <form action="{{ route('admin.logout') }}" method="POST" class="d-inline">
@@ -185,22 +181,17 @@
                     @endauth
                 </div>
             </nav>
-
             <main class="main-content-area">
                 @yield('content')
             </main>
         </div>
     </div>
 
-    <!-- Bootstrap JS Bundle -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
-    <!-- Custom JS to handle sidebar toggle -->
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const sidebarCollapse = document.getElementById('sidebarCollapse');
             const sidebar = document.getElementById('sidebar');
-
             if (sidebarCollapse) {
                 sidebarCollapse.addEventListener('click', function () {
                     sidebar.classList.toggle('active');

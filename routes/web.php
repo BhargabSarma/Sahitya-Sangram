@@ -19,6 +19,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\AuthorInquiryController;
 use App\Http\Controllers\Admin\AdminAuthorInquiryController;
 use App\Http\Controllers\Admin\AdminOrderPaymentController;
+use \App\Http\Controllers\Admin\InventoryController;
 
 
 Route::get('/', [HomeController::class, 'index'])->name('index');
@@ -58,9 +59,11 @@ Route::prefix('admin')->as('admin.')->group(function () {
         Route::get('/admin/payments', [AdminOrderPaymentController::class, 'payments'])->name('payments');
         Route::get('/admin/payments/{id}', [AdminOrderPaymentController::class, 'paymentShow'])->name('payments.show');
         Route::post('/admin/payments/{id}/update-status', [AdminOrderPaymentController::class, 'updatePaymentStatus'])->name('payments.updateStatus');
+        //Inventory
+        Route::resource('inventory', InventoryController::class);
     });
 });
-//Authors Routes
+
 Route::get('authors/create', [AuthorController::class, 'create'])->name('authors.create');
 Route::post('authors', [AuthorController::class, 'store'])->name('authors.store');
 Route::get('/authors', [AuthorController::class, 'index'])->name('authors');
