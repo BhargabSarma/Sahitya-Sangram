@@ -12,7 +12,7 @@
                         <strong>Phone:</strong> <a href="tel:{{ $inq->author_phone }}">{{ $inq->author_phone }}</a>
                     </p>
                     <p><strong>Description:</strong> {{ $inq->book_description }}</p>
-                    <p><a href="{{ Storage::url($inq->book_pdf_path) }}" target="_blank">Download PDF</a></p>
+                    <p><a href="{{ route('admin.author.inquiries.download', $inq->id) }}">Download PDF</a></p>
                     <p>Status: <span
                             class="badge bg-{{ $inq->status == 'pending' ? 'warning' : ($inq->status == 'approved' ? 'success' : 'danger') }}">{{ ucfirst($inq->status) }}</span>
                     </p>

@@ -24,7 +24,7 @@ class AuthorInquiryController extends Controller
             'description' => 'required|string|max:2000',
             'category' => 'required|string|max:100',
             'category_other' => 'nullable|string|max:100',
-            'pdf' => 'required|file|mimes:pdf|max:20480', // 20MB
+            'pdf' => 'required|file|mimes:pdf|max:204800', // 200MB
             // Author Details
             'author' => 'required|string|max:255',
             'email' => 'required|email|max:255',
@@ -32,7 +32,7 @@ class AuthorInquiryController extends Controller
             'bio' => 'nullable|string|max:1000',
         ]);
 
-        $pdfPath = $request->file('pdf')->store('author_books', 'public');
+        $pdfPath = $request->file('pdf')->store('author_books', 'local');
 
         // If category is "Others", use category_other
         $category = $request->category === 'Others' && $request->filled('category_other')
@@ -53,5 +53,10 @@ class AuthorInquiryController extends Controller
         ]);
 
         return redirect()->route('author.inquiry.form')->with('success', 'Your book inquiry has been submitted!');
+    }
+    public function download($id)
+    {
+        $inq = AuthorInquiry::findOrFail($id);
+        return Storage::download($inq->book_pdf_path);
     }
 }

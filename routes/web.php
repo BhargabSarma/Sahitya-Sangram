@@ -52,6 +52,7 @@ Route::prefix('admin')->as('admin.')->group(function () {
         Route::post('/admin/author-inquiries/{id}/approve', [AdminAuthorInquiryController::class, 'approve'])->name('author.inquiries.approve');
         Route::post('/admin/author-inquiries/{id}/deny', [AdminAuthorInquiryController::class, 'deny'])->name('author.inquiries.deny');
         Route::delete('/admin/author-inquiries/{id}', [AdminAuthorInquiryController::class, 'destroy'])->name('author.inquiries.destroy');
+        Route::get('admin/author-inquiries/{id}/download', [AuthorInquiryController::class, 'download'])->name('author.inquiries.download');
 
         // Order/Payment Admin Routes
         Route::get('/admin/orders', [AdminOrderPaymentController::class, 'orders'])->name('orders');
