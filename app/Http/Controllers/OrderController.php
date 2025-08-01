@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Cart;
 use App\Models\Address;
+use Illuminate\Support\Facades\Http;
 
 class OrderController extends Controller
 {
@@ -88,6 +89,64 @@ class OrderController extends Controller
         }
 
         $cart->items()->delete();
+
+        // --- Shiprocket Integration ---
+        try {
+            $addressObj = json_decode($shippingAddress);
+
+            $payload = [
+                'order_id' => $order->id,
+                'order_date' => now()->format('Y-m-d'),
+                'pickup_location' => 'Default',
+                'billing_customer_name' => $addressObj->name ?? '',
+                'billing_address' => $addressObj->street ?? '',
+                'billing_city' => $addressObj->city ?? '',
+                'billing_state' => $addressObj->state ?? '',
+                'billing_pincode' => $addressObj->postal_code ?? '',
+                'billing_country' => $addressObj->country ?? '',
+                'billing_email' => Auth::user()->email ?? '',
+                'billing_phone' => $addressObj->phone ?? '',
+                'order_items' => $order->items->map(function ($item) {
+                    return [
+                        'name' => $item->book->title,
+                        'sku' => $item->book_id,
+                        'units' => $item->quantity,
+                        'selling_price' => $item->price,
+                    ];
+                })->values()->toArray(),
+                'payment_method' => 'Prepaid', // or 'COD'
+                'shipping_charges' => 0,
+                'total_discount' => 0,
+                'sub_total' => $order->total,
+                'length' => 10,
+                'breadth' => 10,
+                'height' => 1,
+                'weight' => 0.5,
+            ];
+
+            $response = Http::withHeaders([
+                'Authorization' => 'Bearer ' . config('services.shiprocket.token'),
+                'Content-Type' => 'application/json',
+                'Accept' => 'application/json',
+            ])->post('https://apiv2.shiprocket.in/v1/external/orders/create/adhoc', $payload);
+
+            if ($response->successful()) {
+                $shipData = $response->json();
+                $order->shiprocket_awb = $shipData['awb_code'] ?? null;
+                $order->shiprocket_shipment_id = $shipData['shipment_id'] ?? null;
+                $order->shiprocket_response = json_encode($shipData);
+                $order->status = 'shipped';
+                $order->save();
+            } else {
+                $order->shiprocket_response = $response->body();
+                $order->save();
+                return redirect()->route('order.history')->with('error', 'Shiprocket error: ' . $response->body());
+            }
+        } catch (\Exception $e) {
+            $order->shiprocket_response = $e->getMessage();
+            $order->save();
+            return redirect()->route('order.history')->with('error', 'Could not create shipment: ' . $e->getMessage());
+        }
 
         return redirect()->route('payments.show', $order->id)
             ->with('success', 'Order placed! Please complete your payment.');
