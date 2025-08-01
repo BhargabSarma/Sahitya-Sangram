@@ -19,4 +19,18 @@
             @endif
         </div>
     @endforeach
+    @if($payment->order)
+        @if(!empty($payment->order->shiprocket_awb))
+            <div>
+                <strong>Shipment AWB:</strong> {{ $payment->order->shiprocket_awb }}
+                <a href="https://shiprocket.co/tracking/{{ $payment->order->shiprocket_awb }}" target="_blank" rel="noopener"
+                    class="btn btn-sm btn-outline-primary ms-2">Track</a>
+            </div>
+        @endif
+        @if(!empty($payment->order->shiprocket_shipment_id))
+            <div>
+                <strong>Shipment ID:</strong> {{ $payment->order->shiprocket_shipment_id }}
+            </div>
+        @endif
+    @endif
 @endsection

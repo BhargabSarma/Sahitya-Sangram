@@ -161,7 +161,10 @@
                     <a href="{{ route('admin.author.inquiries') }}"><i class="fas fa-envelope"></i>Author Inquiries</a>
                 </li>
                 <li class="{{ Request::is('admin/payments*') ? 'active' : '' }}">
-                    <a href="{{ route('admin.payments') }}"><i class="fas fa-money-check-alt"></i>Payments & Orders</a>
+                    <a href="{{ route('admin.payments') }}"><i class="fas fa-money-check-alt"></i>Payments</a>
+                </li>
+                <li class="{{ Request::is('admin/orders*') ? 'active' : '' }}">
+                    <a href="{{ route('admin.orders') }}"><i class="fas fa-money-check-alt"></i>Orders</a>
                 </li>
             </ul>
         </nav>

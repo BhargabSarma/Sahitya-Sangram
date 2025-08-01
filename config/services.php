@@ -46,4 +46,8 @@ return [
         'redirect' => env('FACEBOOK_REDIRECT_URI'),
     ],
 
+    'shiprocket' => [
+        'token' => env('SHIPROCKET_TOKEN'),
+    ],
+
 ];

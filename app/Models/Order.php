@@ -11,11 +11,15 @@ class Order extends Model
         'address_id',
         'total',
         'status',
-        'shipping_address'
+        'shipping_address',
+        'shiprocket_awb',
+        'shiprocket_shipment_id',
+        'shiprocket_response'
     ];
 
     protected $casts = [
         'shipping_address' => 'array',
+        'shiprocket_response' => 'array',
     ];
 
     public function items()

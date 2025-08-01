@@ -4,6 +4,7 @@ namespace App\Services;
 
 use Spatie\PdfToImage\Pdf;
 use Illuminate\Support\Facades\Log;
+use Spatie\PdfToImage\Enums\OutputFormat;
 
 class BookImageService
 {
@@ -24,13 +25,19 @@ class BookImageService
         }
         try {
             $pdf = new Pdf($pdfPath);
+
+            // Explicitly set output format to JPG to avoid BMP issues
+            $pdf->format(OutputFormat::Jpg);
+
             $totalPages = $pdf->pageCount();
             $endPage = min($startPage + $batchSize - 1, $totalPages);
+
             for ($i = $startPage; $i <= $endPage; $i++) {
                 try {
+                    // Always save as .jpg
                     $pdf->selectPage($i)->save($outputDir . DIRECTORY_SEPARATOR . "{$i}.jpg");
                 } catch (\Exception $imgEx) {
-                    Log::error("Failed to convert page {$i} of PDF '{$pdfPath}': " . $imgEx->getMessage());
+                    Log::error("Failed to convert page {$i} of PDF '{$pdfPath}' to image '{$outputDir}/{$i}.jpg': " . $imgEx->getMessage());
                     continue;
                 }
                 if ($progressCallback) {
