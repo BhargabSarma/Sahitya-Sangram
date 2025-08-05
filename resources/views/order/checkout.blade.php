@@ -60,6 +60,15 @@
                 @endif
             </div>
 
+            <div class="mb-4">
+                <label for="pincode" class="block font-semibold mb-1">Check Delivery Availability</label>
+                <div class="flex gap-2">
+                    <input type="text" id="pincode" maxlength="6" class="form-control w-40" placeholder="Enter Pincode">
+                    <button type="button" id="checkPincodeBtn" class="btn btn-outline-primary">Check</button>
+                </div>
+                <div id="pincodeResult" class="mt-2 text-sm"></div>
+            </div>
+
             <div>
                 <h2 class="text-lg font-semibold text-slate-700 mb-4">Order Summary</h2>
                 <ul class="divide-y divide-slate-200 mb-4">
@@ -83,8 +92,16 @@
                     @endforeach
                 </ul>
                 <div class="flex justify-between items-center font-semibold text-lg border-t pt-4">
+                    <span>Subtotal</span>
+                    <span id="orderSubtotal" data-subtotal="{{ $grandTotal }}">₹{{ number_format($grandTotal, 2) }}</span>
+                </div>
+                <div class="flex justify-between items-center font-semibold text-lg" id="shippingChargeRow" style="display:none;">
+                    <span>Shipping</span>
+                    <span id="shippingCharge"></span>
+                </div>
+                <div class="flex justify-between items-center font-bold text-lg border-t pt-4">
                     <span>Total</span>
-                    <span class="font-bold text-slate-800">₹{{ number_format($grandTotal, 2) }}</span>
+                    <span id="orderTotal">₹{{ number_format($grandTotal, 2) }}</span>
                 </div>
             </div>
 
@@ -99,6 +116,66 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/CustomEase.min.js"></script>
     <script src="{{ asset('js/index.js') }}"></script>
     <script src="{{ asset('js/hero-gsap.js') }}"></script>
+    <script>
+document.getElementById('checkPincodeBtn').addEventListener('click', function() {
+    const pincode = document.getElementById('pincode').value;
+    const resultDiv = document.getElementById('pincodeResult');
+    resultDiv.textContent = 'Checking...';
+
+    fetch('{{ route('check.pincode') }}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+        },
+        body: JSON.stringify({ pincode })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.error) {
+            resultDiv.textContent = data.error;
+            // Reset shipping summary if error
+            document.getElementById('shippingChargeRow').style.display = 'none';
+            document.getElementById('orderTotal').textContent = document.getElementById('orderSubtotal').dataset.subtotal;
+        } else if (data.data && data.data.available_courier_companies && data.data.available_courier_companies.length) {
+            let html = '<span class="text-success">Delivery available!</span><br>';
+            html += '<ul>';
+            let minRate = null;
+            data.data.available_courier_companies.forEach(c => {
+                html += `<li>${c.courier_name}`;
+                if (c.rate) {
+                    html += ` - Shipping: ₹${c.rate}`;
+                    if (minRate === null || c.rate < minRate) minRate = c.rate;
+                }
+                html += '</li>';
+            });
+            html += '</ul>';
+            resultDiv.innerHTML = html;
+
+            // Show shipping charge in summary
+            if (minRate !== null) {
+                document.getElementById('shippingChargeRow').style.display = '';
+                document.getElementById('shippingCharge').textContent = '₹' + minRate;
+                // Update total
+                const subtotal = parseFloat(document.getElementById('orderSubtotal').dataset.subtotal);
+                document.getElementById('orderTotal').textContent = '₹' + (subtotal + parseFloat(minRate)).toFixed(2);
+            } else {
+                document.getElementById('shippingChargeRow').style.display = 'none';
+                document.getElementById('orderTotal').textContent = document.getElementById('orderSubtotal').dataset.subtotal;
+            }
+        } else {
+            resultDiv.innerHTML = '<span class="text-danger">Delivery not available to this pincode.</span>';
+            document.getElementById('shippingChargeRow').style.display = 'none';
+            document.getElementById('orderTotal').textContent = document.getElementById('orderSubtotal').dataset.subtotal;
+        }
+    })
+    .catch(() => {
+        resultDiv.textContent = 'Error checking pincode.';
+        document.getElementById('shippingChargeRow').style.display = 'none';
+        document.getElementById('orderTotal').textContent = document.getElementById('orderSubtotal').dataset.subtotal;
+    });
+});
+</script>
     
 @include('components.footer')
 </body>

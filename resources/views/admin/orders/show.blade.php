@@ -27,8 +27,10 @@
                 <ul>
                     <li>Name: {{ $shipping['name'] ?? '' }}</li>
                     <li>Phone: {{ $shipping['phone'] ?? '' }}</li>
-                    <li>Address: {{ $shipping['street'] ?? '' }}, {{ $shipping['city'] ?? '' }}, {{ $shipping['state'] ?? '' }},
-                        {{ $shipping['postal_code'] ?? '' }}, {{ $shipping['country'] ?? '' }}</li>
+                    <li>Address: {{ $shipping['street_address'] ?? '' }}, {{ $shipping['city'] ?? '' }},
+                        {{ $shipping['state'] ?? '' }},
+                        {{ $shipping['zip'] ?? '' }}, {{ $shipping['country'] ?? '' }}
+                    </li>
                 </ul>
             @else
                 <em>No address info</em>
@@ -69,6 +71,10 @@
                 </div>
             @else
                 <span class="text-warning"><i class="fa fa-clock-o"></i> Shipment not created yet</span>
+                <form action="{{ route('admin.orders.createShipment', $order->id) }}" method="POST" class="mt-2 d-inline">
+                    @csrf
+                    <button type="submit" class="btn btn-sm btn-primary">Create Shipment</button>
+                </form>
             @endif
             @if(!empty($order->shiprocket_response))
                 <div class="mt-2">
