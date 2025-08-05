@@ -14,7 +14,7 @@ class GetShiprocketToken extends Command
     {
         $response = Http::post('https://apiv2.shiprocket.in/v1/external/auth/login', [
             'email' => 'xandertorreot06@gmail.com',
-            'password' => 'your_api_password',
+            'password' => '9Xmk@DOPxC1@3v^o',
         ]);
         $token = $response->json()['token'] ?? null;
         $this->info('Shiprocket Token: ' . $token);

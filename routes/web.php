@@ -20,6 +20,7 @@ use App\Http\Controllers\AuthorInquiryController;
 use App\Http\Controllers\Admin\AdminAuthorInquiryController;
 use App\Http\Controllers\Admin\AdminOrderPaymentController;
 use \App\Http\Controllers\Admin\InventoryController;
+use \App\Http\Controllers\Admin\DeliveryAgentController;
 
 
 Route::get('/', [HomeController::class, 'index'])->name('index');
@@ -60,8 +61,12 @@ Route::prefix('admin')->as('admin.')->group(function () {
         Route::get('/admin/payments', [AdminOrderPaymentController::class, 'payments'])->name('payments');
         Route::get('/admin/payments/{id}', [AdminOrderPaymentController::class, 'paymentShow'])->name('payments.show');
         Route::post('/admin/payments/{id}/update-status', [AdminOrderPaymentController::class, 'updatePaymentStatus'])->name('payments.updateStatus');
+        Route::post('/admin/orders/{order}/create-shipment', [AdminOrderPaymentController::class, 'createShipment'])->name('orders.createShipment');
         //Inventory
         Route::resource('inventory', InventoryController::class);
+
+        Route::get('courier-partners', [DeliveryAgentController::class, 'showCourierPartners'])->name('courier_partners');
+        Route::post('courier-partners/default', [DeliveryAgentController::class, 'setDefaultCourierPartner'])->name('set_default_courier');
     });
 });
 
@@ -157,3 +162,6 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/library/review/{book}', [LibraryController::class, 'reviewForm'])->name('library.review.form');
     Route::post('/library/review/{book}', [LibraryController::class, 'storeReview'])->name('library.review.store');
 });
+
+// Check Pincode Route
+Route::post('/check-pincode', [OrderController::class, 'checkPincode'])->name('check.pincode');

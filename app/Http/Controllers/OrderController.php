@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\Cart;
 use App\Models\Address;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 class OrderController extends Controller
 {
@@ -47,13 +48,15 @@ class OrderController extends Controller
 
         $address = Address::findOrFail($request->address_id);
 
+        // Save shipping address as JSON in the order (for your records)
         $shippingAddress = json_encode([
             'name' => $address->name ?? '',
+            'full_name' => $address->full_name ?? '',
             'phone' => $address->phone ?? '',
-            'street' => $address->street ?? '',
+            'street_address' => $address->street_address ?? '',
             'city' => $address->city ?? '',
             'state' => $address->state ?? '',
-            'postal_code' => $address->postal_code ?? '',
+            'zip' => $address->zip ?? '',
             'country' => $address->country ?? '',
         ]);
 
@@ -92,20 +95,20 @@ class OrderController extends Controller
 
         // --- Shiprocket Integration ---
         try {
-            $addressObj = json_decode($shippingAddress);
-
+            // Use correct mapping for Shiprocket
             $payload = [
                 'order_id' => $order->id,
                 'order_date' => now()->format('Y-m-d'),
                 'pickup_location' => 'Default',
-                'billing_customer_name' => $addressObj->name ?? '',
-                'billing_address' => $addressObj->street ?? '',
-                'billing_city' => $addressObj->city ?? '',
-                'billing_state' => $addressObj->state ?? '',
-                'billing_pincode' => $addressObj->postal_code ?? '',
-                'billing_country' => $addressObj->country ?? '',
-                'billing_email' => Auth::user()->email ?? '',
-                'billing_phone' => $addressObj->phone ?? '',
+                'billing_customer_name' => $address->full_name ?: $address->name ?: 'Test User',
+                'billing_address' => $address->street_address ?: 'Test Street',
+                'billing_city' => $address->city ?: 'Test City',
+                'billing_state' => $address->state ?: 'Test State',
+                'billing_pincode' => $address->zip ?: '123456',
+                'billing_country' => $address->country ?: 'India',
+                'billing_email' => Auth::user()->email ?: 'test@example.com',
+                'billing_phone' => $address->phone ?: '9999999999',
+                'shipping_is_billing' => true,
                 'order_items' => $order->items->map(function ($item) {
                     return [
                         'name' => $item->book->title,
@@ -114,7 +117,7 @@ class OrderController extends Controller
                         'selling_price' => $item->price,
                     ];
                 })->values()->toArray(),
-                'payment_method' => 'Prepaid', // or 'COD'
+                'payment_method' => 'Prepaid',
                 'shipping_charges' => 0,
                 'total_discount' => 0,
                 'sub_total' => $order->total,
@@ -123,6 +126,8 @@ class OrderController extends Controller
                 'height' => 1,
                 'weight' => 0.5,
             ];
+
+            Log::info('Shiprocket Payload:', $payload);
 
             $response = Http::withHeaders([
                 'Authorization' => 'Bearer ' . config('services.shiprocket.token'),
@@ -148,7 +153,7 @@ class OrderController extends Controller
             return redirect()->route('order.history')->with('error', 'Could not create shipment: ' . $e->getMessage());
         }
 
-        return redirect()->route('payments.show', $order->id)
+        return redirect()->route('order.confirmation', $order->id)
             ->with('success', 'Order placed! Please complete your payment.');
     }
     public function confirmation($orderId)
@@ -161,5 +166,31 @@ class OrderController extends Controller
     {
         $orders = Order::where('user_id', Auth::id())->with('items.book')->latest()->get();
         return view('order.history', compact('orders'));
+    }
+    public function checkPincode(Request $request)
+    {
+        $request->validate([
+            'pincode' => 'required|digits:6',
+        ]);
+
+        try {
+            $response = Http::withHeaders([
+                'Authorization' => 'Bearer ' . config('services.shiprocket.token'),
+                'Content-Type' => 'application/json',
+            ])->get('https://apiv2.shiprocket.in/v1/external/courier/serviceability/', [
+                'pickup_postcode' => '110001', // Your warehouse pincode
+                'delivery_postcode' => $request->pincode,
+                'cod' => 0,
+                'weight' => 0.5,
+            ]);
+
+            if ($response->successful()) {
+                return response()->json($response->json());
+            } else {
+                return response()->json(['error' => 'Could not check pincode.'], 400);
+            }
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
     }
 }

@@ -166,6 +166,9 @@
                 <li class="{{ Request::is('admin/orders*') ? 'active' : '' }}">
                     <a href="{{ route('admin.orders') }}"><i class="fas fa-money-check-alt"></i>Orders</a>
                 </li>
+                <li class="{{ Request::is('admin/courier-partners*') ? 'active' : '' }}">
+                    <a href="{{ route('admin.courier_partners') }}"><i class="fas fa-truck"></i>Courier Delivery</a>
+                </li>
             </ul>
         </nav>
 
