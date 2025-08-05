@@ -20,6 +20,7 @@ use App\Http\Controllers\AuthorInquiryController;
 use App\Http\Controllers\Admin\AdminAuthorInquiryController;
 use App\Http\Controllers\Admin\AdminOrderPaymentController;
 use \App\Http\Controllers\Admin\InventoryController;
+use \App\Http\Controllers\Admin\DeliveryAgentController;
 
 
 Route::get('/', [HomeController::class, 'index'])->name('index');
@@ -62,6 +63,9 @@ Route::prefix('admin')->as('admin.')->group(function () {
         Route::post('/admin/orders/{order}/create-shipment', [AdminOrderPaymentController::class, 'createShipment'])->name('orders.createShipment');
         //Inventory
         Route::resource('inventory', InventoryController::class);
+
+        Route::get('courier-partners', [DeliveryAgentController::class, 'showCourierPartners'])->name('courier_partners');
+        Route::post('courier-partners/default', [DeliveryAgentController::class, 'setDefaultCourierPartner'])->name('set_default_courier');
     });
 });
 
