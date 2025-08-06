@@ -5,11 +5,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Book;
 use App\Models\Author;
+use App\Models\Tag;
+use App\Models\Inventory;
 use Illuminate\Http\Request;
-use Spatie\PdfToImage\Pdf;
-use App\Services\BookImageService;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\File;
 use App\Jobs\ProcessBookPdfJob;
 
@@ -42,12 +40,13 @@ class BookController extends Controller
             'History',
             'Education'
         ];
-        $authors = Author::all(); // Add this line to fetch authors
+        $authors = Author::all();
+        $tags = Tag::withCount('books')->get();
         $book = null;
         if ($request->has('book')) {
             $book = Book::find($request->input('book'));
         }
-        return view('admin.books.create', compact('categories', 'authors', 'book'));
+        return view('admin.books.create', compact('categories', 'authors', 'book', 'tags'));
     }
 
     // Store new book in DB
@@ -64,10 +63,12 @@ class BookController extends Controller
             'book_file' => 'required|file|mimes:pdf,epub|max:2048000',
             'language' => 'nullable|string|max:50',
             'level' => 'required|in:Beginner,Intermediate,Advanced',
-            'is_bestseller' => 'nullable|boolean',
             'hard_copy_price' => 'required|numeric|min:0',
             'digital_price' => 'required|numeric|min:0',
             'author_id' => 'required|exists:authors,id',
+            'discount' => 'nullable|integer|min:0|max:100',
+            'tags' => 'nullable|array',
+            'tags.*' => 'exists:tags,id',
         ]);
 
         $data = $request->all();
@@ -83,15 +84,24 @@ class BookController extends Controller
             $request->file('cover_image_back')->move(base_path('storage/images/back'), $backFilename);
             $data['cover_image_back'] = 'images/back/' . $backFilename;
         }
-        $data['is_bestseller'] = $request->has('is_bestseller') ? 1 : 0;
 
-        // Store the book file in books (not private/books)
+
         $data['book_file'] = $request->file('book_file')->store('books');
+        $data['discount'] = $request->input('discount', null);
+
 
         $book = Book::create($data);
 
-        // Dispatch the job
-        // ProcessBookPdfJob::dispatch($book->id, 1, 25);
+        // Attach tags (max 12 books per tag enforced in blade)
+        if ($request->has('tags')) {
+            $book->tags()->sync($request->input('tags'));
+        }
+
+        // Add 100 stock to inventories table
+        Inventory::create([
+            'book_id' => $book->id,
+            'stock' => 100,
+        ]);
 
         return redirect()->route('admin.books.create', ['book' => $book->id])
             ->with('success', 'Book added! PDF is being processed.');
@@ -135,7 +145,21 @@ class BookController extends Controller
      */
     public function edit(Book $book)
     {
-        return view('admin.books.edit', compact('book'));
+        $categories = [
+            'Fiction',
+            'Non-fiction',
+            'Science',
+            'Technology',
+            'Biography',
+            'Children',
+            'Comics',
+            'Business',
+            'History',
+            'Education'
+        ];
+        $authors = Author::all();
+        $tags = Tag::withCount('books')->get();
+        return view('admin.books.edit', compact('book', 'categories', 'authors', 'tags'));
     }
 
     /**
@@ -143,28 +167,55 @@ class BookController extends Controller
      */
     public function update(Request $request, Book $book)
     {
-        $validated = $request->validate([
-            'title' => 'required',
-            'author' => 'required',
-            'description' => 'nullable',
-            'price' => 'required|numeric',
-
-            'access_type' => 'required|in:purchase,subscription',
-            'cover_image' => 'nullable|image|max:10240',
-            'book_file' => 'required|file|mimes:pdf,epub|max:51200',
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'subtitle' => 'nullable|string|max:255',
+            'description' => 'nullable|string',
+            'category' => 'required|string|max:100',
+            'number_of_pages' => 'nullable|integer|min:1',
+            'cover_image_front' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:10240',
+            'cover_image_back' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:10240',
+            'book_file' => 'nullable|file|mimes:pdf,epub|max:2048000',
+            'language' => 'nullable|string|max:50',
+            'level' => 'required|in:Beginner,Intermediate,Advanced',
+            'hard_copy_price' => 'required|numeric|min:0',
+            'digital_price' => 'required|numeric|min:0',
+            'author_id' => 'required|exists:authors,id',
+            'discount' => 'nullable|integer|min:0|max:100',
+            'tags' => 'nullable|array',
+            'tags.*' => 'exists:tags,id',
         ]);
 
-        if ($request->hasFile('cover_image')) {
-            $validated['cover_image'] = $request->file('cover_image')->store('covers');
-        }
+        $data = $request->all();
+        $bookName = preg_replace('/[^A-Za-z0-9_\-]/', '_', $request->input('title')); // Sanitize book name
 
+        if ($request->hasFile('cover_image_front')) {
+            $frontFilename = $bookName . '_front.' . $request->file('cover_image_front')->getClientOriginalExtension();
+            $request->file('cover_image_front')->move(base_path('storage/images/front'), $frontFilename);
+            $data['cover_image_front'] = 'images/front/' . $frontFilename;
+        }
+        if ($request->hasFile('cover_image_back')) {
+            $backFilename = $bookName . '_back.' . $request->file('cover_image_back')->getClientOriginalExtension();
+            $request->file('cover_image_back')->move(base_path('storage/images/back'), $backFilename);
+            $data['cover_image_back'] = 'images/back/' . $backFilename;
+        }
         if ($request->hasFile('book_file')) {
-            $validated['book_file'] = $request->file('book_file')->store('books');
+            $data['book_file'] = $request->file('book_file')->store('books');
+        }
+        $data['discount'] = $request->input('discount', null);
+
+
+        $book->update($data);
+
+        // Sync tags
+        if ($request->has('tags')) {
+            $book->tags()->sync($request->input('tags'));
+        } else {
+            $book->tags()->sync([]);
         }
 
-        $book->update($validated);
-
-        return redirect()->route('books.index')->with('success', 'Book updated.');
+        return redirect()->route('admin.books.edit', $book->id)
+            ->with('success', 'Book updated successfully!');
     }
 
     /**
@@ -193,62 +244,62 @@ class BookController extends Controller
         ]);
     }
     // BooksController.php
-    
-    //search kora controller + paginate
-public function bookshelf(Request $request)
-{
-    $query = $request->input('q');
 
-    // If no query, just show all books paginated
-    if (!$query) {
-        $books = Book::orderBy('created_at', 'desc')->paginate(12);
+    //search kora controller + paginate
+    public function bookshelf(Request $request)
+    {
+        $query = $request->input('q');
+
+        // If no query, just show all books paginated
+        if (!$query) {
+            $books = Book::orderBy('created_at', 'desc')->paginate(12);
+            return view('bookshelf', compact('books', 'query'));
+        }
+
+        // First, try to match books by title
+        $books = Book::where('title', 'like', "%$query%")
+            ->orderBy('created_at', 'desc')
+            ->paginate(12);
+
+        // If no books by title, try to match author name
+        if ($books->isEmpty()) {
+            $books = Book::whereHas('author', function ($authorQuery) use ($query) {
+                $authorQuery->where('name', 'like', "%$query%");
+            })
+                ->orderBy('created_at', 'desc')
+                ->paginate(12);
+        }
+
         return view('bookshelf', compact('books', 'query'));
     }
 
-    // First, try to match books by title
-    $books = Book::where('title', 'like', "%$query%")
-                 ->orderBy('created_at', 'desc')
-                 ->paginate(12);
+    // For AJAX search
+    public function ajaxSearch(Request $request)
+    {
+        $query = $request->input('q');
 
-    // If no books by title, try to match author name
-    if ($books->isEmpty()) {
-        $books = Book::whereHas('author', function($authorQuery) use ($query) {
-                        $authorQuery->where('name', 'like', "%$query%");
-                    })
-                    ->orderBy('created_at', 'desc')
-                    ->paginate(12);
-    }
+        if (!$query) {
+            $books = Book::orderBy('created_at', 'desc')->limit(15)->get();
+            return view('components.bookshelf-results', compact('books'))->render();
+        }
 
-    return view('bookshelf', compact('books', 'query'));
-}
+        // First, try to match books by title
+        $books = Book::where('title', 'like', "%$query%")
+            ->orderBy('created_at', 'desc')
+            ->limit(15)
+            ->get();
 
-// For AJAX search
-public function ajaxSearch(Request $request)
-{
-    $query = $request->input('q');
+        // If no books by title, try to match author name
+        if ($books->isEmpty()) {
+            $books = Book::whereHas('author', function ($authorQuery) use ($query) {
+                $authorQuery->where('name', 'like', "%$query%");
+            })
+                ->orderBy('created_at', 'desc')
+                ->limit(15)
+                ->get();
+        }
 
-    if (!$query) {
-        $books = Book::orderBy('created_at', 'desc')->limit(15)->get();
         return view('components.bookshelf-results', compact('books'))->render();
-    }
-
-    // First, try to match books by title
-    $books = Book::where('title', 'like', "%$query%")
-                 ->orderBy('created_at', 'desc')
-                 ->limit(15)
-                 ->get();
-
-    // If no books by title, try to match author name
-    if ($books->isEmpty()) {
-        $books = Book::whereHas('author', function($authorQuery) use ($query) {
-                        $authorQuery->where('name', 'like', "%$query%");
-                    })
-                    ->orderBy('created_at', 'desc')
-                    ->limit(15)
-                    ->get();
-    }
-
-    return view('components.bookshelf-results', compact('books'))->render();
     }
     //new 
     public function startConversion(Book $book)
@@ -259,7 +310,7 @@ public function ajaxSearch(Request $request)
         ProcessBookPdfJob::dispatch($book->id, 1, 25); // 25 = batch size
         $book->image_processing_status = 'processing';
         $book->save();
-    
+
         return back()->with('status', 'Conversion started!');
     }
 }

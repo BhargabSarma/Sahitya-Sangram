@@ -21,6 +21,7 @@ use App\Http\Controllers\Admin\AdminAuthorInquiryController;
 use App\Http\Controllers\Admin\AdminOrderPaymentController;
 use \App\Http\Controllers\Admin\InventoryController;
 use \App\Http\Controllers\Admin\DeliveryAgentController;
+use App\Http\Controllers\Admin\TagController;
 
 
 Route::get('/', [HomeController::class, 'index'])->name('index');
@@ -67,6 +68,14 @@ Route::prefix('admin')->as('admin.')->group(function () {
 
         Route::get('courier-partners', [DeliveryAgentController::class, 'showCourierPartners'])->name('courier_partners');
         Route::post('courier-partners/default', [DeliveryAgentController::class, 'setDefaultCourierPartner'])->name('set_default_courier');
+
+        // Tag management
+        Route::prefix('tags')->name('tags.')->group(function () {
+            Route::get('/', [TagController::class, 'manage'])->name('manage');
+            Route::post('/', [TagController::class, 'store'])->name('store');
+            Route::post('/{tag}/assign-books', [TagController::class, 'assignBooks'])->name('assignBooks');
+            Route::delete('/{tag}', [TagController::class, 'destroy'])->name('destroy');
+        });
     });
 });
 

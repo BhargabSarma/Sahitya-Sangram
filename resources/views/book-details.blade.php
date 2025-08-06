@@ -249,7 +249,6 @@
 <body class="text-slate-800">
 
     @include('components.header')
-
     <main class="py-12 md:py-16 lg:py-32">
         <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="grid grid-cols-1 lg:grid-cols-12 lg:gap-x-12">
@@ -293,17 +292,7 @@
                         </div>
 
                         <div class="w-full max-w-xs flex flex-col gap-3">
-                            <a href="{{ route('books.read', ['id' => $book->id]) }}"
-                                class="w-full text-center px-6 py-3 rounded-lg bg-indigo-600 text-white font-semibold text-base shadow-sm hover:bg-indigo-500 transition-colors duration-200">
-                                Read Now
-                            </a>
                             <div class="space-y-3">
-
-                                @php
-                                    $inventory = \App\Models\Inventory::where('book_id', $book->id)->first();
-                                    $hardCopyStock = $inventory ? $inventory->stock : 0;
-                                @endphp
-
                                 <div id="price-selector" class="grid grid-cols-2 gap-2">
                                     <button data-price-type="hard_copy"
                                         class="price-btn w-full py-2 rounded-md font-semibold bg-indigo-100 text-indigo-700 ring-2 ring-indigo-600">Hard
@@ -311,16 +300,27 @@
                                     <button data-price-type="digital_copy"
                                         class="price-btn w-full py-2 rounded-md font-semibold bg-white text-slate-600 ring-1 ring-slate-300">Digital</button>
                                 </div>
+                                @php
+                                    $inventory = \App\Models\Inventory::where('book_id', $book->id)->first();
+                                @endphp
 
                                 <button id="add-to-cart-btn"
-                                    class="w-full text-center px-6 py-3 rounded-lg font-semibold text-base shadow-sm transition-colors duration-200 bg-slate-800 text-white hover:bg-slate-700"
-                                    data-book-id="{{ $book->id }}" data-hard-copy-stock="{{ $hardCopyStock }}">
-                                    Add to Cart
-                                    <span id="price-display" class="ml-2 font-bold">₹{{ $book->hard_copy_price }}</span>
+                                    class="w-full text-center px-6 py-3 rounded-lg bg-slate-800 text-white font-semibold text-base shadow-sm hover:bg-slate-700 transition-colors duration-200"
+                                    data-book-id="{{ $book->id }}">
+                                    Add to Cart <span id="price-display"
+                                        class="ml-2 font-bold">₹{{ $book->hard_copy_price }}</span>
                                 </button>
-                                <span id="stock-warning" class="text-red-600 text-sm font-semibold mt-2"
-                                    style="display:none;">Hard Copy Unavailable</span>
                             </div>
+                            <button type="button" id="buy-now-btn"
+                                class="w-full text-center px-6 py-3 rounded-lg bg-green-600 text-white font-semibold text-base shadow-sm hover:bg-green-500 transition-colors duration-200 mt-2">
+                                Buy Now
+                            </button>
+                            <a href="{{ route('books.read', ['id' => $book->id]) }}" id="read-now-btn"
+                                class="w-full text-center px-6 py-3 rounded-lg bg-indigo-600 text-white font-semibold text-base shadow-sm hover:bg-indigo-500 transition-colors duration-200 mt-2"
+                                style="display:none;">
+                                Read Now
+                            </a>
+
                         </div>
                     </div>
                 </aside>
@@ -341,21 +341,30 @@
                     <p class="mt-4 text-base sm:text-lg font-medium text-slate-700">By
                         {{ $book->author->name ?? 'AUTHOR' }}
                     </p>
+                    @php
+                        $reviews = $book->reviews()->with('user')->latest()->get();
+                        $reviewCount = $reviews->count();
+                        $avgRating = $reviewCount ? round($reviews->avg('rating'), 1) : 0;
+                    @endphp
+
                     <div class="flex items-center gap-2 mt-4 flex-wrap">
                         <div class="flex items-center">
-                            @for ($i = 0; $i < 5; $i++)
-                                <svg class="w-5 h-5 {{ ($book->rating ?? 4.5) > $i ? 'text-yellow-400' : 'text-slate-300' }}"
+                            @for ($i = 1; $i <= 5; $i++)
+                                <svg class="w-5 h-5 {{ $i <= floor($avgRating) ? 'text-yellow-400' : 'text-slate-300' }}"
                                     xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                                    <path
-                                        d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1
+                                                1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0
+                                                00.951-.69l1.07-3.292z" />
                                 </svg>
                             @endfor
                         </div>
-                        <span class="text-slate-600 text-sm font-medium">{{ $book->rating ?? '4.5' }} out of 5</span>
+                        <span class="text-slate-600 text-sm font-medium">{{ $avgRating }} out of 5</span>
                         <span class="hidden sm:inline text-slate-400">·</span>
-                        <a href="#"
-                            class="text-sm font-medium text-indigo-600 hover:text-indigo-500 w-full sm:w-auto">{{ $book->review_count ?? 5 }}
-                            Reviews</a>
+                        <a href="#reviews"
+                            onclick="event.preventDefault(); document.getElementById('reviews').scrollIntoView({behavior: 'smooth'});"
+                            class="text-sm font-medium text-indigo-600 hover:text-indigo-500 w-full sm:w-auto">
+                            {{ $reviewCount }} {{ \Illuminate\Support\Str::plural('Review', $reviewCount) }}
+                        </a>
                     </div>
                     <div class="mt-8 pt-6 border-t border-slate-200">
                         <h2 class="text-base font-semibold text-slate-900">Details</h2>
@@ -425,6 +434,7 @@
             </div>
         </div>
     </section>
+    @include('components.reviews-carousel', ['reviews' => $book->reviews()->with('user')->latest()->get()])
 
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="{{ asset('js/turn.min.js') }}"></script>
@@ -518,33 +528,67 @@
             const priceSelector = document.getElementById('price-selector');
             const priceDisplay = document.getElementById('price-display');
             const addCartBtn = document.getElementById('add-to-cart-btn');
-            const stockWarning = document.getElementById('stock-warning');
             const bookEditions = {
                 hard_copy: { name: 'Hard Copy', price: '{{ $book->hard_copy_price }}', type: 'hard_copy' },
                 digital_copy: { name: 'Digital', price: '{{ $book->digital_price  }}', type: 'digital_copy' }
             };
             let selectedType = 'hard_copy';
 
-            // Get stock from data attribute for hard copy
-            const hardCopyStock = parseInt(addCartBtn.getAttribute('data-hard-copy-stock'), 10);
+            const hasBoughtDigital = @json($hasBoughtDigital);
 
-            function updateCartButtonState() {
+            function updateActionButtons() {
+                const buyNowBtn = document.getElementById('buy-now-btn');
+                const readNowBtn = document.getElementById('read-now-btn');
+                const addCartBtn = document.getElementById('add-to-cart-btn');
+
+                // Get inventory info from backend
+                const inventory = @json($inventory);
+                const hardCopyOutOfStock = !inventory || inventory.stock <= 0;
+
                 if (selectedType === 'hard_copy') {
-                    priceDisplay.textContent = '₹' + bookEditions.hard_copy.price;
-                    if (hardCopyStock < 1) {
+                    buyNowBtn.style.display = '';
+                    readNowBtn.style.display = 'none';
+
+                    if (hardCopyOutOfStock) {
+                        buyNowBtn.disabled = true;
+                        buyNowBtn.textContent = "Out Of Stock!";
+                        buyNowBtn.classList.add("bg-slate-500", "opacity-60", "cursor-not-allowed");
+                        buyNowBtn.classList.remove("bg-green-600", "hover:bg-green-500");
+
+                        // Add to Cart is unavailable for hard copy if out of stock
                         addCartBtn.disabled = true;
-                        addCartBtn.classList.add('bg-slate-500', 'opacity-60', 'cursor-not-allowed');
-                        stockWarning.style.display = '';
+                        addCartBtn.innerHTML = `Add to Cart <span id="price-display" class="ml-2 font-bold">₹${bookEditions['hard_copy'].price}</span>`;
+                        addCartBtn.classList.add("bg-slate-500", "opacity-60", "cursor-not-allowed");
+                        addCartBtn.classList.remove("bg-slate-800", "hover:bg-slate-700");
                     } else {
+                        buyNowBtn.disabled = false;
+                        buyNowBtn.textContent = "Buy Now";
+                        buyNowBtn.classList.remove("bg-slate-500", "opacity-60", "cursor-not-allowed");
+                        buyNowBtn.classList.add("bg-green-600", "hover:bg-green-500");
+
                         addCartBtn.disabled = false;
-                        addCartBtn.classList.remove('bg-slate-500', 'opacity-60', 'cursor-not-allowed');
-                        stockWarning.style.display = 'none';
+                        addCartBtn.innerHTML = `Add to Cart <span id="price-display" class="ml-2 font-bold">₹${bookEditions['hard_copy'].price}</span>`;
+                        addCartBtn.classList.remove("bg-slate-500", "opacity-60", "cursor-not-allowed");
+                        addCartBtn.classList.add("bg-slate-800", "hover:bg-slate-700");
                     }
-                } else {
-                    priceDisplay.textContent = '₹' + bookEditions.digital_copy.price;
+                } else if (selectedType === 'digital_copy') {
+                    buyNowBtn.classList.remove("bg-slate-500", "opacity-60", "cursor-not-allowed");
+                    buyNowBtn.classList.add("bg-green-600", "hover:bg-green-500");
+                    buyNowBtn.textContent = "Buy Now";
+                    buyNowBtn.disabled = false;
+
                     addCartBtn.disabled = false;
-                    addCartBtn.classList.remove('bg-slate-500', 'opacity-60', 'cursor-not-allowed');
-                    stockWarning.style.display = 'none';
+                    addCartBtn.innerHTML = `Add to Cart <span id="price-display" class="ml-2 font-bold">₹${bookEditions['digital_copy'].price}</span>`;
+                    addCartBtn.classList.remove("bg-slate-500", "opacity-60", "cursor-not-allowed");
+                    addCartBtn.classList.add("bg-slate-800", "hover:bg-slate-700");
+
+                    if (hasBoughtDigital) {
+                        buyNowBtn.style.display = 'none';
+                        readNowBtn.style.display = '';
+                    } else {
+                        buyNowBtn.style.display = '';
+                        readNowBtn.style.display = 'none';
+                    }
                 }
             }
 
@@ -552,7 +596,6 @@
                 priceSelector.addEventListener('click', function (e) {
                     const button = e.target.closest('.price-btn');
                     if (!button || button.dataset.priceType === selectedType) return;
-
                     selectedType = button.dataset.priceType;
                     priceSelector.querySelectorAll('.price-btn').forEach(btn => {
                         btn.classList.remove('bg-indigo-100', 'text-indigo-700', 'ring-2', 'ring-indigo-600');
@@ -560,12 +603,14 @@
                     });
                     button.classList.add('bg-indigo-100', 'text-indigo-700', 'ring-2', 'ring-indigo-600');
                     button.classList.remove('bg-white', 'text-slate-600', 'ring-1', 'ring-slate-300');
-
-                    updateCartButtonState();
+                    if (priceDisplay && bookEditions[selectedType]) {
+                        priceDisplay.textContent = '₹' + bookEditions[selectedType].price;
+                    }
+                    updateActionButtons();
                 });
             }
-            // Initial state
-            updateCartButtonState();
+            updateActionButtons();
+
             if (addCartBtn) {
                 addCartBtn.addEventListener('click', function () {
                     const bookId = this.getAttribute('data-book-id');
@@ -619,7 +664,12 @@
             window.addEventListener('resize', function () {
                 setTimeout(initializeFlipbook, 100);
             });
-
+            const buyNowBtn = document.getElementById('buy-now-btn');
+            if (buyNowBtn) {
+                buyNowBtn.addEventListener('click', function () {
+                    window.location.href = `{{ url('/checkout') }}?book_id={{ $book->id }}&type=${selectedType}`;
+                });
+            }
             // Phone-only tap-to-flip logic
             function isMobile() {
                 return window.innerWidth <= 600;

@@ -64,11 +64,26 @@
                     <option value="Advanced" @if(old('level') === 'Advanced') selected @endif>Advanced</option>
                 </select>
             </div>
-            <div class="mb-3 form-check">
-                <input type="checkbox" name="is_bestseller" class="form-check-input" id="is_bestseller" value="1"
-                    @if(old('is_bestseller')) checked @endif>
-                <label class="form-check-label" for="is_bestseller">Bestseller</label>
+        <!-- Add this block for tags selection -->
+<div class="mb-3">
+    <label class="form-label">Tags</label>
+    <div>
+        @foreach($tags as $tag)
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="checkbox" name="tags[]" value="{{ $tag->id }}"
+                    {{ (is_array(old('tags')) && in_array($tag->id, old('tags', []))) ? 'checked' : '' }}
+                    @if($tag->books->count() >= 12) disabled @endif
+                >
+                <label class="form-check-label">
+                    {{ $tag->name }}
+                    @if($tag->books->count() >= 12)
+                        <span class="text-danger">(Max 12 reached)</span>
+                    @endif
+                </label>
             </div>
+        @endforeach
+    </div>
+</div>
             <div class="mb-3">
                 <label class="form-label">Hard Copy Price *</label>
                 <input type="number" name="hard_copy_price" class="form-control" step="0.01" min="0"
