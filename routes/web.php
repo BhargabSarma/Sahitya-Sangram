@@ -19,17 +19,14 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\AuthorInquiryController;
 use App\Http\Controllers\Admin\AdminAuthorInquiryController;
 use App\Http\Controllers\Admin\AdminOrderPaymentController;
-use \App\Http\Controllers\Admin\InventoryController;
-use \App\Http\Controllers\Admin\DeliveryAgentController;
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
+use App\Http\Controllers\Admin\InventoryController;
+use App\Http\Controllers\Admin\DeliveryAgentController;
+
 use App\Http\Controllers\Admin\TagController;
-=======
-use \App\Http\Controllers\Admin\AdminBookController;
->>>>>>> Stashed changes
-=======
-use \App\Http\Controllers\Admin\AdminBookController;
->>>>>>> Stashed changes
+
+use App\Http\Controllers\Admin\AdminBookController;
+
+
 
 
 Route::get('/', [HomeController::class, 'index'])->name('index');
@@ -76,8 +73,7 @@ Route::prefix('admin')->as('admin.')->group(function () {
         //Courier Routes
         Route::get('courier-partners', [DeliveryAgentController::class, 'showCourierPartners'])->name('courier_partners');
         Route::post('courier-partners/default', [DeliveryAgentController::class, 'setDefaultCourierPartner'])->name('set_default_courier');
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
+
 
         // Tag management
         Route::prefix('tags')->name('tags.')->group(function () {
@@ -86,14 +82,12 @@ Route::prefix('admin')->as('admin.')->group(function () {
             Route::post('/{tag}/assign-books', [TagController::class, 'assignBooks'])->name('assignBooks');
             Route::delete('/{tag}', [TagController::class, 'destroy'])->name('destroy');
         });
-=======
+
         Route::get('/admin/books/index', [AdminBookController::class, 'index'])->name('books.index');
         Route::post('/admin/books/discount/bulk-update', [AdminBookController::class, 'bulkUpdateDiscount'])->name('books.discount.bulkUpdate');
->>>>>>> Stashed changes
-=======
+
         Route::get('/admin/books/index', [AdminBookController::class, 'index'])->name('books.index');
         Route::post('/admin/books/discount/bulk-update', [AdminBookController::class, 'bulkUpdateDiscount'])->name('books.discount.bulkUpdate');
->>>>>>> Stashed changes
     });
 });
 
