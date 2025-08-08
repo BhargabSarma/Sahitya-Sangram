@@ -20,6 +20,8 @@ class Book extends Model
         'is_bestseller',
         'hard_copy_price',
         'digital_price',
+        'hard_copy_discount',
+        'digital_discount',
         'author_id',
     ];
     public function author()

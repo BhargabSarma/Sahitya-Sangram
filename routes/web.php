@@ -21,7 +21,11 @@ use App\Http\Controllers\Admin\AdminAuthorInquiryController;
 use App\Http\Controllers\Admin\AdminOrderPaymentController;
 use \App\Http\Controllers\Admin\InventoryController;
 use \App\Http\Controllers\Admin\DeliveryAgentController;
+<<<<<<< Updated upstream
 use App\Http\Controllers\Admin\TagController;
+=======
+use \App\Http\Controllers\Admin\AdminBookController;
+>>>>>>> Stashed changes
 
 
 Route::get('/', [HomeController::class, 'index'])->name('index');
@@ -65,9 +69,10 @@ Route::prefix('admin')->as('admin.')->group(function () {
         Route::post('/admin/orders/{order}/create-shipment', [AdminOrderPaymentController::class, 'createShipment'])->name('orders.createShipment');
         //Inventory
         Route::resource('inventory', InventoryController::class);
-
+        //Courier Routes
         Route::get('courier-partners', [DeliveryAgentController::class, 'showCourierPartners'])->name('courier_partners');
         Route::post('courier-partners/default', [DeliveryAgentController::class, 'setDefaultCourierPartner'])->name('set_default_courier');
+<<<<<<< Updated upstream
 
         // Tag management
         Route::prefix('tags')->name('tags.')->group(function () {
@@ -76,6 +81,10 @@ Route::prefix('admin')->as('admin.')->group(function () {
             Route::post('/{tag}/assign-books', [TagController::class, 'assignBooks'])->name('assignBooks');
             Route::delete('/{tag}', [TagController::class, 'destroy'])->name('destroy');
         });
+=======
+        Route::get('/admin/books/index', [AdminBookController::class, 'index'])->name('books.index');
+        Route::post('/admin/books/discount/bulk-update', [AdminBookController::class, 'bulkUpdateDiscount'])->name('books.discount.bulkUpdate');
+>>>>>>> Stashed changes
     });
 });
 
@@ -155,7 +164,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/checkout', [OrderController::class, 'checkout'])->name('order.checkout');
     Route::post('/checkout', [OrderController::class, 'checkout'])->name('order.checkout.post');
     Route::post('/order/place', [OrderController::class, 'placeOrder'])->name('order.place');
-    Route::get('/order/confirmation/{order}', [OrderController::class, 'confirmation'])->name('order.confirmation');
+    Route::get('/order/confirmation/{orderId}', [OrderController::class, 'confirmation'])->name('order.confirmation');
     Route::get('/orders', [OrderController::class, 'history'])->name('order.history');
 
     // Payment routes (add these to complete payment process)

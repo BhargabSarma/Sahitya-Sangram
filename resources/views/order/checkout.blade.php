@@ -107,9 +107,30 @@
                 </div>
                 {{-- Default Courier Shipping --}}
                 @if($defaultCourier)
-                    <div class="flex justify-between items-center font-semibold text-lg" id="shippingChargeRow">
+                    {{-- Only show shipping if cart has hard_copy --}}
+                    @php
+                        $hasHardCopy = collect($cart->items)->contains(function($item) {
+                            return $item->type === 'hard_copy';
+                        });
+                    @endphp
+
+                    <div class="flex justify-between items-center font-semibold text-lg" id="shippingChargeRow" @if(!$hasHardCopy) style="display:none;" @endif>
                         <span>Shipping</span>
-                        <span id="shippingCharge">₹{{ number_format($defaultCourier->shipping_price, 2) }}</span>
+                        <span id="shippingCharge">
+                            @if($defaultCourier && $hasHardCopy)
+                                ₹{{ number_format($defaultCourier->shipping_price, 2) }}
+                            @endif
+                        </span>
+                    </div>
+                    <div class="flex justify-between items-center font-bold text-lg border-t pt-4">
+                        <span>Total</span>
+                        <span id="orderTotal">
+                            @if($defaultCourier && $hasHardCopy)
+                                ₹{{ number_format($grandTotal + $defaultCourier->shipping_price, 2) }}
+                            @else
+                                ₹{{ number_format($grandTotal, 2) }}
+                            @endif
+                        </span>
                     </div>
                 @else
                     <div class="flex justify-between items-center font-semibold text-lg" id="shippingChargeRow" style="display:none;">
@@ -117,16 +138,6 @@
                         <span id="shippingCharge"></span>
                     </div>
                 @endif
-                <div class="flex justify-between items-center font-bold text-lg border-t pt-4">
-                    <span>Total</span>
-                    <span id="orderTotal">
-                        @if($defaultCourier)
-                            ₹{{ number_format($grandTotal + $defaultCourier->shipping_price, 2) }}
-                        @else
-                            ₹{{ number_format($grandTotal, 2) }}
-                        @endif
-                    </span>
-                </div>
             </div>
 
             <div>
@@ -142,6 +153,8 @@
 <script src="{{ asset('js/hero-gsap.js') }}"></script>
 <script>
     // If you want pincode check to override shipping charge, keep this JS
+    const hasHardCopy = {{ $hasHardCopy ? 'true' : 'false' }};
+
     document.getElementById('checkPincodeBtn').addEventListener('click', function() {
         const pincode = document.getElementById('pincode').value;
         const resultDiv = document.getElementById('pincodeResult');
@@ -159,31 +172,16 @@
         .then(data => {
             if (data.error) {
                 resultDiv.textContent = data.error;
-                // Reset shipping summary if error
                 document.getElementById('shippingChargeRow').style.display = 'none';
                 document.getElementById('orderTotal').textContent = document.getElementById('orderSubtotal').dataset.subtotal;
             } else if (data.data && data.data.available_courier_companies && data.data.available_courier_companies.length) {
-                let html = '<span class="text-success">Delivery available!</span><br>';
-                html += '<ul>';
-                let minRate = null;
-                data.data.available_courier_companies.forEach(c => {
-                    html += `<li>${c.courier_name}`;
-                    if (c.rate) {
-                        html += ` - Shipping: ₹${c.rate}`;
-                        if (minRate === null || c.rate < minRate) minRate = c.rate;
-                    }
-                    html += '</li>';
-                });
-                html += '</ul>';
-                resultDiv.innerHTML = html;
-
-                // Show shipping charge in summary (prefer lowest rate for the checked pincode)
-                if (minRate !== null) {
+                resultDiv.innerHTML = '<span class="text-success">Delivery available!</span>';
+                if (hasHardCopy) {
+                    const defaultShipping = {{ $defaultCourier ? $defaultCourier->shipping_price : 0 }};
                     document.getElementById('shippingChargeRow').style.display = '';
-                    document.getElementById('shippingCharge').textContent = '₹' + minRate;
-                    // Update total
+                    document.getElementById('shippingCharge').textContent = '₹' + defaultShipping;
                     const subtotal = parseFloat(document.getElementById('orderSubtotal').dataset.subtotal);
-                    document.getElementById('orderTotal').textContent = '₹' + (subtotal + parseFloat(minRate)).toFixed(2);
+                    document.getElementById('orderTotal').textContent = '₹' + (subtotal + parseFloat(defaultShipping)).toFixed(2);
                 } else {
                     document.getElementById('shippingChargeRow').style.display = 'none';
                     document.getElementById('orderTotal').textContent = document.getElementById('orderSubtotal').dataset.subtotal;

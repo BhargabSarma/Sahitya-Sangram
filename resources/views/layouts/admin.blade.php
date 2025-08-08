@@ -164,13 +164,20 @@
                     <a href="{{ route('admin.payments') }}"><i class="fas fa-money-check-alt"></i>Payments</a>
                 </li>
                 <li class="{{ Request::is('admin/orders*') ? 'active' : '' }}">
-                    <a href="{{ route('admin.orders') }}"><i class="fas fa-money-check-alt"></i>Orders</a>
+                    <a href="{{ route('admin.orders') }}"><i class="fas fa-receipt"></i>Orders</a>
                 </li>
                 <li class="{{ Request::is('admin/courier-partners*') ? 'active' : '' }}">
                     <a href="{{ route('admin.courier_partners') }}"><i class="fas fa-truck"></i>Courier Delivery</a>
                 </li>
+<<<<<<< Updated upstream
                 <li class="{{ Request::is('admin/tags*') ? 'active' : '' }}">
                     <a href="{{ route('admin.tags.manage') }}"><i class="fas fa-tags"></i>Tags & Discounts</a>
+=======
+                <li class="{{ Request::is('admin/books/index*') ? 'active' : '' }}">
+                    <a href="{{ route('admin.books.index') }}">
+                        <i class="fas fa-percent"></i>Discounts
+                    </a>
+>>>>>>> Stashed changes
                 </li>
             </ul>
         </nav>
