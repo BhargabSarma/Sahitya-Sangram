@@ -169,21 +169,12 @@
                 <li class="{{ Request::is('admin/courier-partners*') ? 'active' : '' }}">
                     <a href="{{ route('admin.courier_partners') }}"><i class="fas fa-truck"></i>Courier Delivery</a>
                 </li>
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-                <li class="{{ Request::is('admin/tags*') ? 'active' : '' }}">
-                    <a href="{{ route('admin.tags.manage') }}"><i class="fas fa-tags"></i>Tags & Discounts</a>
-=======
-=======
->>>>>>> Stashed changes
+
                 <li class="{{ Request::is('admin/books/index*') ? 'active' : '' }}">
                     <a href="{{ route('admin.books.index') }}">
                         <i class="fas fa-percent"></i>Discounts
                     </a>
-<<<<<<< Updated upstream
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
+
                 </li>
             </ul>
         </nav>
